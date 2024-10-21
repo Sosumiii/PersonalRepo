@@ -38,7 +38,7 @@ public class Project138 {
                     }
                     else if (thirdChoice == 2)
                     {
-                        System.out.println("You chose to use the axe on the rock. \n there is a significant chance that the rocks might crumble \n upon you, but you start doing like cavecraft Steve and start swinging. \n The rocks come crashing down and you are left unscathed. \n you quickly find your way back to civilization.");
+                        System.out.println("You chose to use the axe on the rock. \n there is a significant chance that the rocks might crumble \n upon you, but you start making like Minecraft Steve and start swinging. \n The rocks come crashing down and you are left unscathed. \n you quickly find your way back to civilization.");
                         System.out.print("The local newspaper reads: \n Local adventurer, " + playerName + ", has gotten trapped in the local caves. \n" + playerName + " has simply dug out of the cave using a handy pickaxe.");
                     }
                 }
@@ -78,7 +78,7 @@ public class Project138 {
                 if (secondChoice == 1)
                 {
                     System.out.println("You have decided to exit the cave and report your findings.");
-                    System.out.print("The local newspaper reads: \n Local adventurer, " + playerName + "has reported a cave with a collapsed entrance. \n Please do not visit the cave for your safety.");
+                    System.out.print("The local newspaper reads: \n Local adventurer, " + playerName + " has reported a cave with a collapsed entrance. \n Please do not visit the cave for your safety.");
                 }
                 else if (secondChoice == 2)
                 {
