@@ -75,25 +75,26 @@ public class EscapeRoom
       //Primary movement controls. VScode Recommends to switch them to switch cases. 
       String input = UserInput.getValidInput(validCommands);
       
-      //Checks for traps
-      if (input.equals("replay"))
-      {
-        game.replay();
-      }
       if (input.equals("quit"))
       {
-        game.endGame();
+        score += game.endGame();
+
+        System.out.println("score=" + score);
+        System.out.println("steps=" + game.getSteps());
       }
 
       if (input.equals("check") || input.equals("c"))
       {
-        game.isTrap(px, py);
+        if (game.isTrap(px, py))
+        {
+          score += game.springTrap(px, py);
+        }
       }
 
       //Springs a trap on command
       if (input.equals("trigger") || input.equals("t"))
       {
-        game.springTrap(px, py);
+        score += game.springTrap(px, py);
       }
 
       if (input.equals("pickup") || input.equals("p"))
@@ -104,19 +105,19 @@ public class EscapeRoom
       //Standard Movement controls.
       if (input.equals("right") || input.equals("r"))
       {
-        game.movePlayer(m, 0);
+        score += game.movePlayer(m, 0);
       }
       else if (input.equals("left") || input.equals("l")) 
       {
-        game.movePlayer(-m, 0);
+        score += game.movePlayer(-m, 0);
       }
       else if (input.equals("up") || input.equals("u")) 
       {
-        game.movePlayer(0, -m);
+        score += game.movePlayer(0, -m);
       }
       else if (input.equals("down") || input.equals("d")) 
       {
-        game.movePlayer(0, m);
+        score += game.movePlayer(0, m);
       }
 
       //Jump moves the player one space further than the traditional movement commands.
