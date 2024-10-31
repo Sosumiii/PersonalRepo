@@ -62,7 +62,7 @@ public class EscapeRoom
     Scanner in = new Scanner(System.in);
     String[] validCommands = { "right", "left", "up", "down", "r", "l", "u", "d",
     "jump", "jr", "jumpleft", "jl", "jumpup", "ju", "jumpdown", "jd",
-    "pickup", "p", "quit", "q", "replay", "help", "?", "c", "check", "t", "trigger"};
+    "pickup", "p", "quit", "q", "replay", "help", "?", "c", "check"};
   
     // set up game
     boolean play = true;
@@ -72,9 +72,13 @@ public class EscapeRoom
 	  /* Your code here */
     
       { 
-      //Primary movement controls. VScode Recommends to switch them to switch cases. 
+      //Primary control functions. VScode Recommends to switch them to switch cases. 
       String input = UserInput.getValidInput(validCommands);
       
+      //Displays a list of valid commands.
+      if (input.equals("help") || input.equals("?"))
+      System.out.println("Here is a list of commands: \nMove right: right, 'r'\nMove left: left, l\nMove up: up, u\nMove down: down, d\nJump right: jr\nJump left: jumpleft, jl\nJump up: jumpup, ju\nJump down: jumpdown, jd\nPick up item: pickup, p\nQuit game: quit, q\nReplay game: replay\nDisplay help: help, ?\nCheck for traps and spring them if they are present: c, check");
+
       if (input.equals("quit"))
       {
         score += game.endGame();
@@ -83,23 +87,29 @@ public class EscapeRoom
         System.out.println("steps=" + game.getSteps());
       }
 
+      //Checks for traps
       if (input.equals("check") || input.equals("c"))
       {
-        if (game.isTrap(px, py))
-        {
-          score += game.springTrap(px, py);
-        }
+        game.isTrap(px+m, py);
+        game.isTrap(px-m, py);
+        game.isTrap(px, py+m);
+        game.isTrap(px, py-m);
       }
-
-      //Springs a trap on command
-      if (input.equals("trigger") || input.equals("t"))
+      
+      //Triggers the trap
+      if (input.equals("Trigger") || input.equals("t"))
       {
         score += game.springTrap(px, py);
       }
 
+      if (input.equals("replay"))
+      {
+        score += game.replay();
+      }
+
       if (input.equals("pickup") || input.equals("p"))
       {
-        game.pickupPrize();
+        score += game.pickupPrize();
       }
 
       //Standard Movement controls.
@@ -123,19 +133,19 @@ public class EscapeRoom
       //Jump moves the player one space further than the traditional movement commands.
       if (input.equals("jumpright") || input.equals("jr"))
       {
-        game.movePlayer(j, 0);
+        score += game.movePlayer(j, 0);
       }
       else if (input.equals("jumpleft") || input.equals("jl")) 
       {
-        game.movePlayer(-j, 0);
+        score += game.movePlayer(-j, 0);
       }
       else if (input.equals("jumpup") || input.equals("ju")) 
       {
-        game.movePlayer(0, -j);
+        score += game.movePlayer(0, -j);
       }
       else if (input.equals("jumpdown") || input.equals("jd")) 
       {
-        game.movePlayer(0, j);
+        score += game.movePlayer(0, j);
       }
     }
 
