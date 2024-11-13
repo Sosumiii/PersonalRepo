@@ -57,9 +57,9 @@ class MyRobot(commands2.TimedCommandRobot):
 
         #Swerve Module Locations
         backLeftLocation = Translation2d(-.381, -.381)
-        backRightLocation = None
-        frontLeftLocation = None
-        frontRightLocation = None
+        backRightLocation = Translation2d(0, 0)
+        frontLeftLocation = Translation2d(0, 0)
+        frontRightLocation = Translation2d(0, 0)
         
         self.kinematics = SwerveDrive4Kinematics(backLeftLocation, backRightLocation, frontLeftLocation, frontRightLocation)
         return super().robotInit()
@@ -68,12 +68,11 @@ class MyRobot(commands2.TimedCommandRobot):
         self.lastChassisSpeed = speeds
 
         speeds = ChassisSpeeds(speeds.vx, speeds.vy, speeds.omega)
-        backLeft = self.kinematics.toSwerveModuleStates(speeds)
 
-        backLeftOptimized = SwerveModuleState.optimize(backLeft, Rotation2d(ticks2rad(self.backLeftRotationEnc.get_absolute_position().value_as_double)))
-
-        self.backLeftRotation.set(self.BleftPID.calculate(self.backLeftRotationEnc.get_absolute_position()._value, lratio(backLeftOptimized.angle.radians())))
-        self.backLeftDrive.set(backLeftOptimized.speed)
+        angle = math.atan2(speeds.vy, speeds.vx)
+        speed = math.hypot(speeds.vx, speeds.vy)
+        self.backLeftDrive.set(speed)
+        self.backLeftRotation.set(self.BleftPID.calculate(self.backLeftRotationEnc.get_absolute_position()._value, lratio(angle)))  
         
     
     def teleopPeriodic(self) -> None:
@@ -92,6 +91,7 @@ class MyRobot(commands2.TimedCommandRobot):
         heading = h2 * (math.pi*2)
     
         speeds = ChassisSpeeds.fromRobotRelativeSpeeds(vx, vy, omega, Rotation2d(heading))
+
 
         self.manualDrive(speeds)
         return super().teleopPeriodic()
