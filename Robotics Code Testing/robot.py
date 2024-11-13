@@ -40,10 +40,10 @@ class MyRobot(commands2.TimedCommandRobot):
         self.backLeftDrive = rev.CANSparkMax(8, rev.CANSparkMax.MotorType.kBrushless)
 
         #Encoder init
-        self.backLeftDriveEnc = self.backLeftDrive.getEncoder(rev.SparkRelativeEncoder)
+        self.backLeftDriveEnc = self.backLeftDrive.getEncoder()
         self.backLeftRotationEnc = phoenix6.hardware.CANcoder(12)
     
-        self.joystick = wpilib.Joystick(0)
+        self.joystick = wpilib.XboxController(0)
 
         #Gyro init
         self.gyro = phoenix6.hardware.Pigeon2(14)
@@ -71,14 +71,25 @@ class MyRobot(commands2.TimedCommandRobot):
 
         angle = math.atan2(speeds.vy, speeds.vx)
         speed = math.hypot(speeds.vx, speeds.vy)
+
+        print(self.BleftPID.calculate(self.backLeftRotationEnc.get_absolute_position()._value, lratio(angle)), speed)
         self.backLeftDrive.set(speed)
         self.backLeftRotation.set(self.BleftPID.calculate(self.backLeftRotationEnc.get_absolute_position()._value, lratio(angle)))  
-        
     
+    def autonomousInit(self) -> None:
+        return super().autonomousInit()
+    
+    def autonomousPeriodic(self) -> None:
+        return super().autonomousPeriodic()
+        
+    def teleopInit(self) -> None:
+        return super().teleopInit()
+
     def teleopPeriodic(self) -> None:
-        vy = self.joystick.getX()
-        vx = self.joystick.getY()
-        omega = self.joystick.getTwist()
+        vy = self.joystick.getLeftX()
+        vx = self.joystick.getLeftY()
+    
+        omega = self.joystick.getRightX()
 
         yaw = self.gyro.get_yaw().value_as_double
 
@@ -90,8 +101,13 @@ class MyRobot(commands2.TimedCommandRobot):
 
         heading = h2 * (math.pi*2)
     
-        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(vx, vy, omega, Rotation2d(heading))
+        
 
+        if False:#xspeed == 0 and yspeed == 0 and tspeed == 0:
+            self.backLeftDrive.set(0)
+            self.backLeftRotation.set(0)        
+        else:
+            speeds = ChassisSpeeds.fromRobotRelativeSpeeds(vx, vy, omega, Rotation2d(heading))
+            self.manualDrive(speeds)
 
-        self.manualDrive(speeds)
         return super().teleopPeriodic()
