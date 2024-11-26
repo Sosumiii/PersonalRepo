@@ -98,7 +98,8 @@ class drivetrain(commands2.Subsystem):
         
         self.frontLeftModule.setState(swerveModuleStates[0])
         self.frontRightModule.setState(swerveModuleStates[1])
-        self.back
+        self.backLeftModule.setState(swerveModuleStates[2])
+        self.backRightModule.setState(swerveModuleStates[3])
         
         
     def updateOdometry(self):
