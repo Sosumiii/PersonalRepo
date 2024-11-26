@@ -32,15 +32,9 @@ class swerveModule(commands2.Subsystem):
         self.drivePID.enableContinuousInput(-0.5, 0.5) 
         self.drivePID.setSetpoint(0.0) 
 
-        self.rotationPID = wpimath.controller.ProfiledPIDController(
-            kP,
-            0.00,
-            0.00,
-            wpimath.trajectory.TrapezoidProfile(
-                kModuleMaxAngularAcceleration,
-                kModuleMaxAngularVelocity
-            ),
-        )
+        self.rotationPID = wpimath.controller.PIDController(kP, 0.00, 0.000)
+        self.rotationPID.enableContinuousInput(-0.5, 0.5) 
+        self.rotationPID.setSetpoint(0.0) 
 
         # Initialize encoder values
         self.driveEnc.getPosition()
