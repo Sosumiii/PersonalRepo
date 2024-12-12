@@ -201,11 +201,16 @@ public class Review {
   {
     String string1 = textToString(fileName);
     String moddedWord = "";
+    String finalWord = "";
+    
     for (String word: string1.split(" "))
     {
       if (word.contains("*"))
       {
-        moddedWord += word.replace(word, randomAdjective()) + " "; //pls fix it brokey :(
+        moddedWord += word.replace(word, randomAdjective()) + " "; //Fixed :)
+        int index = moddedWord.indexOf(",");
+        moddedWord = moddedWord.substring(0, index) + " ";
+        
       }
       else
       {
