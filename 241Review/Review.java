@@ -200,23 +200,23 @@ public class Review {
   public static String fakeReview(String fileName)
   {
     String string1 = textToString(fileName);
-    String moddedWord = "";
+    String ModdedString = "";
     String finalWord = "";
     
     for (String word: string1.split(" "))
     {
       if (word.contains("*"))
       {
-        moddedWord += word.replace(word, randomAdjective()) + " "; //Fixed :)
-        int index = moddedWord.indexOf(",");
-        moddedWord = moddedWord.substring(0, index) + " ";
+        ModdedString += word.replace(word, randomAdjective()) + " "; //Fixed :)
+        int index = ModdedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
+        ModdedString = ModdedString.substring(0, index) + " "; //removes the comma and sentiment value present after the adjective.
         
       }
       else
       {
-        moddedWord += word + " ";
+        ModdedString += word + " ";
       }
     }
-    return moddedWord;
+    return ModdedString;
   }
 }
