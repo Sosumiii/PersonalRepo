@@ -205,7 +205,7 @@ public class Review {
     {
       if (word.contains("*"))
       {
-        moddedWord += word.replace(word, randomAdjective()) + " ";
+        moddedWord += word.replace(word, randomAdjective()) + " "; //pls fix it brokey :(
       }
       else
       {
