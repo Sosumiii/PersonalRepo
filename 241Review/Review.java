@@ -174,7 +174,27 @@ public class Review {
   {
     int stars = 0;
     double sentiVal = totalSentiment(filename);
-    if sentiVal 
+    if (sentiVal >= 35.0)
+    {
+      stars += 5;
+    }
+    else if (sentiVal >= 30)
+    {
+      stars += 4;
+    }
+    else if (sentiVal >= 25.0)
+    {
+      stars += 3;
+    }
+    else if (sentiVal >= 15.0)
+    {
+      stars += 2;
+    }
+    else
+    {
+      stars += 1;
+    }
+
     return stars;
   }
 }
