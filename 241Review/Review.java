@@ -200,10 +200,18 @@ public class Review {
   public static String fakeReview(String fileName)
   {
     String string1 = textToString(fileName);
+    String moddedWord = "";
     for (String word: string1.split(" "))
     {
-      word.indexOf("*");
+      if (word.contains("*"))
+      {
+        moddedWord += word.replace(word, randomAdjective()) + " ";
+      }
+      else
+      {
+        moddedWord += word + " ";
+      }
     }
-    return "q";
+    return moddedWord;
   }
 }
