@@ -197,4 +197,13 @@ public class Review {
 
     return stars;
   }
+  public static String fakeReview(String fileName)
+  {
+    String string1 = textToString(fileName);
+    for (String word: string1.split(" "))
+    {
+      word.indexOf("*");
+    }
+    return "q";
+  }
 }
