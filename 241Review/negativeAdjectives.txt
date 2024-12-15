@@ -8,7 +8,7 @@ abnormal,-0.34
 aboard,-0.15
 abrupt,-0.83
 abruptly,-1.11
-absence,-0.8
+absen e,-0.8
 absolute,-1.51
 abstract,-0.09
 absurd,-1.23

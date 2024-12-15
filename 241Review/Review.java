@@ -200,7 +200,7 @@ public class Review {
   public static String fakeReview(String fileName)
   {
     String string1 = textToString(fileName);
-    String ModdedString = "";
+    String moddedString = "";
     String currentPunctuation = "";
     
     for (String word: string1.split(" "))
@@ -208,25 +208,25 @@ public class Review {
       currentPunctuation = getPunctuation(word);
       if (word.contains("*"))
       {
-        ModdedString += word.replace(word, randomAdjective()) + " "; //Fixed :)
-        int index = ModdedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
+        moddedString += word.replace(word, randomAdjective()) + " "; //Fixed :)
+        int index = moddedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
         System.out.println(index);
-        ModdedString = ModdedString.substring(0, index) + currentPunctuation + " "; //removes the comma and sentiment value present after the adjective.
+        moddedString = moddedString.substring(0, index) + currentPunctuation + " "; //removes the comma and sentiment value present after the adjective.
         
       }
       else
       {
-        ModdedString += word + " ";
+        moddedString += word + " ";
       }
     }
-    return ModdedString;
+    return moddedString;
     
     
   }
   public static String fakePositiveReview(String fileName)
   {
     String string1 = textToString(fileName);
-    String ModdedString = "";
+    String moddedString = "";
     String currentPunctuation = "";
     
     for (String word: string1.split(" "))
@@ -234,25 +234,25 @@ public class Review {
       currentPunctuation = getPunctuation(word);
       if (word.contains("*"))
       {
-        ModdedString += word.replace(word, randomPositiveAdj()) + " "; //Fixed :)
-        int index = ModdedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
+        moddedString += word.replace(word, randomPositiveAdj()) + " "; //Fixed :)
+        int index = moddedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
         System.out.println(index);
-        ModdedString = ModdedString.substring(0, index) + currentPunctuation + " "; //removes the comma and sentiment value present after the adjective.
+        moddedString = moddedString.substring(0, index) + currentPunctuation + " "; //removes the comma and sentiment value present after the adjective.
         
       }
       else
       {
-        ModdedString += word + " ";
+        moddedString += word + " ";
       }
     }
-    return ModdedString;
+    return moddedString;
     
     
   }
   public static String fakeNegativeReview(String fileName)
   {
     String string1 = textToString(fileName);
-    String ModdedString = "";
+    String moddedString = "";
     String currentPunctuation = "";
     
     for (String word: string1.split(" "))
@@ -260,19 +260,94 @@ public class Review {
       currentPunctuation = getPunctuation(word);
       if (word.contains("*"))
       {
-        ModdedString += word.replace(word, randomNegativeAdj()) + " "; //Fixed :)
-        int index = ModdedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
+        moddedString += word.replace(word, randomNegativeAdj()) + " "; //Fixed :)
+        int index = moddedString.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
         System.out.println(index);
-        ModdedString = ModdedString.substring(0, index) + currentPunctuation + " "; //removes the comma and sentiment value present after the adjective.
+        moddedString = moddedString.substring(0, index) + currentPunctuation + " "; //removes the comma and sentiment value present after the adjective.
         
       }
       else
       {
-        ModdedString += word + " ";
+        moddedString += word + " ";
       }
     }
-    return ModdedString;
+    return moddedString;
     
     
   }
+  
+  public static String fakeStrongPositiveReview(String fileName)
+  {
+    String string1 = textToString(fileName);
+    String moddedString = "";
+    String currentPunctuation = "";
+    
+    for (String word: string1.split(" "))
+    {
+      currentPunctuation = getPunctuation(word);
+      if (word.contains("*")) //Checks for the word to be replaced
+      {
+        double currentVal = sentimentVal(word);
+        double strongVal = currentVal;
+        String moddedWord = word;
+
+        while (strongVal <= currentVal) //Checks to see if the value of the word that its trying to replace has a lower value than the value of the word that its trying to replace.
+        {
+          moddedWord = word.replace(word, randomPositiveAdj()); //Fixed :)
+          int index = moddedWord.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
+
+          moddedWord = moddedWord.substring(0, index);
+          strongVal = sentimentVal(moddedWord);
+
+        }
+        moddedString += moddedWord + currentPunctuation + " ";
+        
+      }
+      else
+      {
+        moddedString += word + " ";
+      }
+    }
+    return moddedString;
+    
+    
+  }
+
+  public static String fakeStrongNegativeReview(String fileName)
+  {
+    String string1 = textToString(fileName);
+    String moddedString = "";
+    String currentPunctuation = "";
+    
+    for (String word: string1.split(" "))
+    {
+      currentPunctuation = getPunctuation(word);
+      if (word.contains("*")) //Checks for the word to be replaced
+      {
+        double currentVal = sentimentVal(word);
+        double strongVal = currentVal;
+        String moddedWord = word;
+
+        while (strongVal >= currentVal) //Checks to see if the value of the word that its trying to replace has a lower value than the value of the word that its trying to replace.
+        {
+          moddedWord = word.replace(word, randomNegativeAdj()); //Fixed :)
+          int index = moddedWord.indexOf(","); //finds the commas usually present after a adjective when randomAdjective is called.
+
+          moddedWord = moddedWord.substring(0, index);
+          strongVal = sentimentVal(moddedWord);
+
+        }
+        moddedString += moddedWord + currentPunctuation + " ";
+        
+      }
+      else
+      {
+        moddedString += word + " ";
+      }
+    }
+    return moddedString;
+    
+    
+  }
+  
 }
