@@ -8,12 +8,6 @@ public class MainPokemonBattle
 {
     public static void main(String[] args)
     {
-        int pokemonHealth = 100;
-        int playerPokemonHealth = 100;
-
-        while (pokemonHealth >= 0 || playerPokemonHealth >= 0)
-        {
-            
-        }
+        System.out.println(PokemonBattleSubsystem.enemyAttack());
     }
 }

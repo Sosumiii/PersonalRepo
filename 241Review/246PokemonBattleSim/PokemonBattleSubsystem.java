@@ -6,15 +6,14 @@ import java.util.Random;
 
 public class PokemonBattleSubsystem
 {
+    //initialize class level variables
     public static int playerPokemonHealth = 100;
     public static int pokemonHealth = 100;
     public static int potionAmt = 4;
     public static int strongPotionAmt = 2;
     public static int antidoteAmt = 3;
-    public static int quickAttackAmt = 15;
-    public static int thunderBoltAmt = 7;
     
-    public static int useItem(String item) //This method is used when the user opts to bring up the item menu.
+    public static int useItem(String item) //This method is used when the user wants to select an item.
     {
         int potionValue = 15;
         int strongPotionValue = 25;
@@ -75,19 +74,19 @@ public class PokemonBattleSubsystem
             
     }
 
-    public static int attacks(String attack) //This method is used whenever the player wants to make an attack (based on some of Pikachu's common attacks)
+    public static int attacks(String playerAttack) //This method is used whenever the player wants to make an attack (based on some of Pikachu's common attacks)
     {
         int quickAttackValue = 25;
         int thunderBoltValue = 35;
 
         Random rn = new Random();
 
-        while (!attack.equals("quick attack") && !attack.equals("thunderbolt"))
+        while (!playerAttack.equals("quick attack") && !playerAttack.equals("thunderbolt"))
         {
             System.out.println("Invalid input.");
         }
 
-        if (attack.equals("quick attack") && quickAttackAmt > 0)
+        if (playerAttack.equals("quick attack"))
         {
             if (rn.nextInt(100) > 20)
             {
@@ -102,7 +101,7 @@ public class PokemonBattleSubsystem
             }
         }
 
-        if (attack.equals("thunderbolt") && thunderBoltAmt > 0)
+        if (playerAttack.equals("thunderbolt"))
         {
             if (rn.nextInt(100) > 20)
             {
@@ -119,6 +118,60 @@ public class PokemonBattleSubsystem
         return 0;
 
     }
+
+    public static String displayStatus()
+    {
+        return "Marowak Health: " + pokemonHealth + "\nYour Pikachu's Health: " + playerPokemonHealth;
+    }
+
+    public static String displayInventory()
+    {
+        return "Strong potion: " + strongPotionAmt + "\nPotion: " + potionAmt + "\nAntidotes: " + antidoteAmt;
+    }
+
+    public static int enemyAttack()
+    {
+        int boneRushValue = 25;
+        int falseSwipeValue = 10;
+
+        Random rn = new Random();
+
+        int attackValue = rn.nextInt(2);
+
+        if (attackValue == 0)
+        {
+            if (rn.nextInt(100) > 20)
+            {
+                System.out.println("Attack failed");
+
+                return 0;
+            }
+            else
+            {
+                System.out.println("Marowak used used bone rush.");
+                return boneRushValue;
+            }
+        }
+
+        if (attackValue == 1)
+        {
+            if (rn.nextInt(100) > 20)
+            {
+                System.out.println("Attack failed");
+
+                return 0;
+            }
+            else
+            {
+                System.out.println("Marowak used used false swipe.");
+                return falseSwipeValue;
+            }
+        }
+
+        
+        return 0;
+    }
+    
 
 
 }
