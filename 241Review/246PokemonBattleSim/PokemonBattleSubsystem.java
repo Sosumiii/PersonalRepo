@@ -11,167 +11,139 @@ public class PokemonBattleSubsystem
     public static int pokemonHealth = 100;
     public static int potionAmt = 4;
     public static int strongPotionAmt = 2;
-    public static int antidoteAmt = 3;
     
-    public static int useItem(String item) //This method is used when the user wants to select an item.
+    public static void useItem(String item) //This method is used when the user wants to select an item.
     {
         int potionValue = 15;
         int strongPotionValue = 25;
-        int antidoteValue = 1;
-
-        while (!item.equals("potion") && !item.equals("strong") && !item.equals("antidote"))
-        {
-            System.out.println("Invalid input.");
-        }
 
         if (item.equals("potion"))
         {
-            if (potionAmt > 0)
+            if (potionAmt > 0 && playerPokemonHealth < 100)
             {
-                System.out.println("A potion was used.");
+                System.out.println("A potion was used. \n");
                 potionAmt--;
-                return potionValue;
+                playerPokemonHealth += potionValue;
+                if (playerPokemonHealth > 100)
+                {
+                    playerPokemonHealth = 100;
+                }
             }
-            else
+            else if (potionAmt == 0)
             {
-                System.out.println("There are no more potions.");
-                return 0;
+                System.out.println("There are no more potions. \n");
+            }
+            else if (playerPokemonHealth == 100)
+            {
+                System.out.println("Pikachu is at full health. \n");
             }
         }
         else if (item.equals("strong potion"))
         {
-            if (strongPotionAmt > 0)
+            if (strongPotionAmt > 0 && playerPokemonHealth < 100)
             {
                 System.out.println("A strong potion was used.");
                 strongPotionAmt--;
-                return strongPotionValue;
+                playerPokemonHealth += strongPotionValue;
+                if (playerPokemonHealth > 100)
+                {
+                    playerPokemonHealth = 100;
+                }
             }
-            else
+            else if (strongPotionAmt == 0)
             {
                 System.out.println("There are no more strong potions.");
-                return 0;
             }
-        }
-        else if (item.equals("antidote"))
-        {
-            if (strongPotionAmt > 0)
+            else if (playerPokemonHealth == 100)
             {
-                System.out.println("An antidote was used.");
-                antidoteAmt--;
-                return antidoteValue;
-            }
-            else
-            {
-                System.out.println("There are no more antidotes.");
-                return 0;
+                System.out.println("Pikachu is at full health");
             }
         }
-        else
-        {
-            System.out.println("Exiting item menu");
-            return 0;
-        }
-            
     }
 
-    public static int attacks(String playerAttack) //This method is used whenever the player wants to make an attack (based on some of Pikachu's common attacks)
+    public static void attacks(String playerAttack) //This method is used whenever the player wants to make an attack (based on some of Pikachu's common attacks)
     {
-        int quickAttackValue = 25;
-        int thunderBoltValue = 35;
+        int quickAttackValue = 15;
+        int thunderBoltValue = 20;
 
         Random rn = new Random();
 
-        while (!playerAttack.equals("quick attack") && !playerAttack.equals("thunderbolt"))
-        {
-            System.out.println("Invalid input.");
-        }
+        int genNum1 = rn.nextInt(100); //added to ensure that randomly generated numbers are differentiated.
+        //System.out.println(genNum1); //debug
 
         if (playerAttack.equals("quick attack"))
         {
-            if (rn.nextInt(100) > 20)
+            if (genNum1 < 10)
             {
-                System.out.println("Attack failed");
-
-                return 0;
+                System.out.println("Pikachu's attack missed!");
             }
             else
             {
                 System.out.println("Pikachu used quick attack.");
-                return quickAttackValue;
+                pokemonHealth -= quickAttackValue;
             }
         }
 
         if (playerAttack.equals("thunderbolt"))
         {
-            if (rn.nextInt(100) > 20)
+            if (genNum1 < 10)
             {
-                System.out.println("Attack failed");
-                return 0;
+                System.out.println("Pikachu's attack missed!");
             }
             else
             {
                 System.out.println("Pikachu used Thunderbolt.");
-                return thunderBoltValue;
+                pokemonHealth -= thunderBoltValue;
             }
         }
-
-        return 0;
 
     }
 
     public static String displayStatus()
     {
-        return "Marowak Health: " + pokemonHealth + "\nYour Pikachu's Health: " + playerPokemonHealth;
+        return "Marowak's Health: " + pokemonHealth + "\nYour Pikachu's Health: " + playerPokemonHealth;
     }
 
     public static String displayInventory()
     {
-        return "Strong potion: " + strongPotionAmt + "\nPotion: " + potionAmt + "\nAntidotes: " + antidoteAmt;
+        return "Strong potion: " + strongPotionAmt + "\nPotion: " + potionAmt;
     }
 
-    public static int enemyAttack()
+    public static void enemyAttack()
     {
         int boneRushValue = 25;
-        int falseSwipeValue = 10;
+        int falseSwipeValue = 12;
 
         Random rn = new Random();
 
         int attackValue = rn.nextInt(2);
+        int genNum2 = rn.nextInt(100); //added to ensure that randomly generated numbers are differentiated.
+        //System.out.println(genNum2); //debug
 
         if (attackValue == 0)
         {
-            if (rn.nextInt(100) > 20)
+            if (genNum2 < 10)
             {
-                System.out.println("Attack failed");
-
-                return 0;
+                System.out.println("Marowak's attack missed!\n");;
             }
             else
             {
-                System.out.println("Marowak used used bone rush.");
-                return boneRushValue;
+                System.out.println("Marowak used used bone rush.\n");
+                playerPokemonHealth -= boneRushValue;
             }
         }
 
-        if (attackValue == 1)
+        else
         {
-            if (rn.nextInt(100) > 20)
+            if (genNum2 < 10)
             {
-                System.out.println("Attack failed");
-
-                return 0;
+                System.out.println("Marowak's attack missed!\n");
             }
             else
             {
-                System.out.println("Marowak used used false swipe.");
-                return falseSwipeValue;
+                System.out.println("Marowak used false swipe.\n");
+                playerPokemonHealth -= falseSwipeValue;
             }
         }
-
-        
-        return 0;
     }
-    
-
-
 }
