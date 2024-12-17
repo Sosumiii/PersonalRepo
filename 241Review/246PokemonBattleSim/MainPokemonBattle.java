@@ -4,7 +4,7 @@
  */
 
 
-public class 246PokemonBattle
+public class MainPokemonBattle
 {
     public static void main(String[] args)
     {
