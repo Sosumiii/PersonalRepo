@@ -1,0 +1,28 @@
+..This is a framework for your code. NOT actual code.
+
+Class Drivetrain()
+    Init Function
+        backLeft = swerveModule(DriveID, RotationID, RotationEncChannel)
+        backRight = swerveModule(DriveID, RotationID, RotationEncChannel)
+        frontLeft = swerveModule(DriveID, RotationID, RotationEncChannel)
+        frontRight = swerveModule(DriveID, RotationID, RotationEncChannel)
+
+        Gyro = Gyro(GyroID)
+        setGyro to 0 degrees
+        Odometry = swerveModulePositions //get swerve module positions for all 4 modules.
+
+    Drive Function (Xspeed, Yspeed, Rotation)
+        Speeds = ChassisSpeeds(Xspeed, Yspeed, Rotation)
+    
+        Convert to swerve module states
+            Descritize ChassisSpeeds
+                set ChassisSpeeds from fieldRelativeSpeeds(Xspeed, Yspeed, Rotation, Rotation2d)
+            Get the time elapsed
+
+        Desaturate the wheel Speeds(swerveModuleStates, MaxModuleSpeed)
+
+        Set the states for each swerveModule
+
+    Update Odometry for the Robot
+    
+
