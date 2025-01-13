@@ -6,9 +6,10 @@ import commands2
 import wpimath.controller
 import wpimath.kinematics
 import wpimath.trajectory
+import wpimath.units
 from wpilib import DriverStation
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
-from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, SwerveDrive4WheelPositions, ChassisSpeeds, SwerveModuleState, SwerveModulePosition
+from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 
 kWheelRadius = 0.0508 #Wheel radius in Meters
 kDriveEncoderRes = 2048 #TalonFX Enocder Resolution
@@ -16,13 +17,13 @@ kMaxAngularVelocity = math.pi
 kMaxAngularAcceleration = math.tau
 kGearRatio = 6
 
-def talonFXtoDistance(EncoderPosition): #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
+def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
     return (EncoderPosition * math.pi * (2*kWheelRadius) / (kDriveEncoderRes * kGearRatio))
 
-def rps2mps(rotations): #Converts from rotations per second to meters per Second
+def rps2mps(rotations) -> float: #Converts from rotations per second to meters per Second
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
 
-def deg2Rot2d(deg):
+def deg2Rot2d(deg) -> float:
     yaw = deg/360
     return Rotation2d(yaw * math.pi * 2)
 
@@ -36,34 +37,43 @@ class swerveModule(commands2.Subsystem):
         
         #Hardware init
         self.driveMotor = phoenix6.hardware.TalonFX(DriveMotorID)
-        self.rotationMotor = rev.CANSparkMax(RotationMotorID, rev.CANSparkMax.MotorType.kBrushless)
+        self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
         self.rotationEncoder = wpilib.AnalogEncoder(RotationEncoderChannelA)
 
-        self.rotationEncoder.reset()
-        self.control = phoenix6.controls.voltage_out.VoltageOut(0)
+        #Just to make sure that the correct settings are actually applied to the drive motor.
+        self.configurator = phoenix6.configs.TalonFXConfigurator
+        motorConfig = phoenix6.configs.TalonFXConfiguration()
+        self.configurator.refresh(motorConfig)
+        self.configurator.apply(motorConfig)
+
+        self.rotationEncoder.setVoltagePercentageRange(0, 5)
+
+        #Motor setup
+        self.control = phoenix6.controls.voltage_out.VoltageOut(0.0)
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0.01,
-            0.0,
-            0.0
-        )
-        
-        self.rotationPIDController = wpimath.controller.ProfiledPIDController(
-            0.01,  # Proportional gain
+            0.001,  # Proportional gain
             0.0,   # Integral gain
             0.0,   # Derivative gain
-            wpimath.trajectory.TrapezoidProfile.Constraints(
-                kMaxAngularVelocity,  # Max angular velocity in radians per second
-                kMaxAngularAcceleration  # Max angular acceleration in radians per second squared
-            ),
         )
+        
+        self.rotationPIDController = wpimath.controller.PIDController(
+            0.001,  # Proportional gain
+            0.0,   # Integral gain
+            0.0,   # Derivative gain
+        )
+
+        self.drivePIDController.enableContinuousInput(-math.pi, math.pi)
+        self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
+
+        self.drivePIDController.setSetpoint(0.0)
+        self.rotationPIDController.setSetpoint(0.0)
         
         #Feed Forward Control
         self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
         self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 0.5)
-        
-        self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
+
 
         super().__init__()
         
@@ -87,14 +97,13 @@ class swerveModule(commands2.Subsystem):
     
     def setState(
             self,
-            newState: wpimath.kinematics.SwerveModuleState
+            newState: SwerveModuleState
     ) -> None:
         """
         Sets a new state for the swerve module to move to.
         """
-        encoderRotation = Rotation2d(self.rotationEncoder.getDistance())
-
-        newState.optimize(encoderRotation)
+        encoderRotation = Rotation2d((self.rotationEncoder.get() * (2*math.pi)))    
+        SwerveModuleState.optimize(newState, encoderRotation)
         
         #Calculates the output for the drive motor
         driveOutput = self.drivePIDController.calculate(rps2mps(self.driveMotor.get_velocity().value_as_double), newState.speed)
@@ -102,10 +111,22 @@ class swerveModule(commands2.Subsystem):
 
         #Calculates the output for the rotation motor
         rotationOutput = self.rotationPIDController.calculate(self.rotationEncoder.get(), newState.angle.radians())
-        rotationFeedForward = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint().velocity)
+        rotationFeedForward = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
-        self.driveMotor.set_control(self.control.output(driveOutput + driveFeedForward))
-        self.rotationMotor.setVoltage(rotationOutput + rotationFeedForward)
+        #driveVoltage = (driveOutput + driveFeedForward)
+        #rotationVoltage = ((rotationOutput + rotationFeedForward) / 3) * 13
+        
+        #self.driveMotor.set_control(self.control.with_output(driveVoltage))
+        self.driveMotor.set(driveOutput)
+        #self.rotationMotor.setVoltage(rotationVoltage)
+        self.rotationMotor.set(newState.speed)
+
+        print("Drive Current: " + str(self.driveMotor.get_torque_current().value_as_double) + " | Rotation Current: " + str(self.rotationMotor.getOutputCurrent()))
+
+    def stopAllMotors(self):
+        self.driveMotor.set(0)
+        self.rotationMotor.set(0)
+
 
 
 class Drivetrain(commands2.Subsystem):
@@ -138,6 +159,7 @@ class Drivetrain(commands2.Subsystem):
                 self.blSM.getPosition(),
                 self.brSM.getPosition()
             ),
+            Pose2d()
         )
 
         super().__init__()
@@ -146,17 +168,19 @@ class Drivetrain(commands2.Subsystem):
         #Method to drive the bot using an Xbox Controller.
 
 
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    xSpeed, ySpeed, rotation, deg2Rot2d(self.gyro.get_yaw().value_as_double)
-                    )
-            ),
-            periodSeconds
-
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            xSpeed, ySpeed, rotation, deg2Rot2d(self.gyro.get_yaw().value_as_double)
         )
+
+        # Discretize the chassis speeds
+        discretizedSpeeds = ChassisSpeeds.discretize(
+            chassisSpeeds, periodSeconds
+        )
+
+        # Convert to swerve module states
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(discretizedSpeeds)
         
-        wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
+        SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 3.0
         )
 
@@ -173,8 +197,11 @@ class Drivetrain(commands2.Subsystem):
             self.frSM.getPosition(),
             self.blSM.getPosition(),
             self.brSM.getPosition()
-            )
+            ),
+        )        
 
-        )
-
-        
+    def stopDrivetrain(self):
+        self.flSM.stopAllMotors()
+        self.frSM.stopAllMotors()
+        self.blSM.stopAllMotors()
+        self.brSM.stopAllMotors()
