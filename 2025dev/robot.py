@@ -18,7 +18,7 @@ class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
         self.controller = wpilib.XboxController(0)
-        self.swerve = drivetrain.Drivetrain()
+        self.drivetrain = drivetrain.Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
         self.xspeedLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -64,7 +64,7 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().robotPeriodic()
 
     def autonomousPeriodic(self) -> None:
-        self.swerve.updateOdometry()
+        self.drivetrain.updateOdometry()
 
     def teleopPeriodic(self) -> None:
 
@@ -76,13 +76,12 @@ class MyRobot(commands2.TimedCommandRobot):
             self.rot=0
 
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
-            self.swerve.stopDrivetrain()
+            self.drivetrain.stopDrivetrain()
         else:
             self.driveWithJoystick()
-
             
             
 
 
     def driveWithJoystick(self) -> None:
-        self.swerve.drive(self.xSpeed, self.ySpeed, self.rot, self.getPeriod())
+        self.drivetrain.drive(self.xSpeed, self.ySpeed, self.rot, self.getPeriod())

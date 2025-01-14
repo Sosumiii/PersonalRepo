@@ -40,16 +40,27 @@ class swerveModule(commands2.Subsystem):
         self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
         self.rotationEncoder = wpilib.AnalogEncoder(RotationEncoderChannelA)
 
-        #Just to make sure that the correct settings are actually applied to the drive motor.
-        self.configurator = phoenix6.configs.TalonFXConfigurator
+        #Just to make sure that the correct settings are actually applied to the motors.
         motorConfig = phoenix6.configs.TalonFXConfiguration()
-        self.configurator.refresh(motorConfig)
-        self.configurator.apply(motorConfig)
 
-        self.rotationEncoder.setVoltagePercentageRange(0, 5)
+        currents = motorConfig.current_limits.with_stator_current_limit_enable(True)
+        currents.with_stator_current_limit(40)
+
+        motorConfig.with_current_limits(currents)
+        motorConfig.serialize()
+
+        self.driveMotor.configurator.apply(motorConfig)
+
+        self.configurator2 = rev.SparkMaxConfig()
+
+        rotationConfig = self.configurator2.smartCurrentLimit(40)
+        
+        self.configurator2.apply(rotationConfig)
+
+        self.rotationEncoder.setVoltagePercentageRange(0, 1)
 
         #Motor setup
-        self.control = phoenix6.controls.voltage_out.VoltageOut(0.0)
+        #self.control = phoenix6.controls.voltage_out.VoltageOut(0.0)
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
@@ -102,26 +113,18 @@ class swerveModule(commands2.Subsystem):
         """
         Sets a new state for the swerve module to move to.
         """
-        encoderRotation = Rotation2d((self.rotationEncoder.get() * (2*math.pi)))    
-        SwerveModuleState.optimize(newState, encoderRotation)
-        
-        #Calculates the output for the drive motor
-        driveOutput = self.drivePIDController.calculate(rps2mps(self.driveMotor.get_velocity().value_as_double), newState.speed)
-        driveFeedForward = self.driveMotorFeedForward.calculate(newState.speed)
+        SwerveModuleState.optimize(newState, Rotation2d(self.rotationEncoder.get() * (2 * math.pi)))
 
-        #Calculates the output for the rotation motor
+        driveOutput = self.drivePIDController.calculate(rps2mps(self.driveMotor.get_velocity().value), newState.speed)
+        driveFF = self.driveMotorFeedForward.calculate(newState.speed)
+
         rotationOutput = self.rotationPIDController.calculate(self.rotationEncoder.get(), newState.angle.radians())
-        rotationFeedForward = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
+        rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
-        #driveVoltage = (driveOutput + driveFeedForward)
-        #rotationVoltage = ((rotationOutput + rotationFeedForward) / 3) * 13
+        self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput + driveFF))
+        self.rotationMotor.setVoltage(rotationOutput + rotationFF)
+        print("Motor position: " + str(self.driveMotor.get_stator_current().value_as_double) + " | Rotation voltage: " + str(self.rotationMotor.getOutputCurrent()))
         
-        #self.driveMotor.set_control(self.control.with_output(driveVoltage))
-        self.driveMotor.set(driveOutput)
-        #self.rotationMotor.setVoltage(rotationVoltage)
-        self.rotationMotor.set(newState.speed)
-
-        print("Drive Current: " + str(self.driveMotor.get_torque_current().value_as_double) + " | Rotation Current: " + str(self.rotationMotor.getOutputCurrent()))
 
     def stopAllMotors(self):
         self.driveMotor.set(0)
