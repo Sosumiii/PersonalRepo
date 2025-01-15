@@ -133,12 +133,12 @@ class Drivetrain(commands2.Subsystem):
     def __init__(self):
 
         #SwerveModule/hardware init
-        self.flSM = swerveModule(0, 1, 0)
-        self.frSM = swerveModule(2, 3, 1)
-        self.blSM = swerveModule(4, 5, 2)
-        self.brSM = swerveModule(6, 7, 3)
+        self.flSM = swerveModule(2, 1, 13)
+        self.frSM = swerveModule(4, 3, 11)
+        self.blSM = swerveModule(8, 7, 12)
+        self.brSM = swerveModule(6, 5, 10)
 
-        self.gyro = phoenix6.hardware.Pigeon2(8)
+        self.gyro = phoenix6.hardware.Pigeon2(14)
         self.gyro.set_yaw(0)
 
         #Location init for kinematics
