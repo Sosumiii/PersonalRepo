@@ -123,6 +123,9 @@ class swerveModule(commands2.Subsystem):
 
         self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput + driveFF))
         self.rotationMotor.setVoltage(rotationOutput + rotationFF)
+
+        self.driveMotor.set(driveOutput)
+        self.rotationMotor.set(rotationOutput)
         print("Motor position: " + str(self.driveMotor.get_stator_current().value_as_double) + " | Rotation voltage: " + str(self.rotationMotor.getOutputCurrent()))
         
 

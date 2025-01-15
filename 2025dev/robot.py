@@ -11,6 +11,7 @@ import wpilib.drive
 import wpimath.filter
 import wpimath.controller
 import drivetrain
+import revdrivetrain
 from wpilib import SmartDashboard
 
 
@@ -18,7 +19,7 @@ class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
         self.controller = wpilib.XboxController(0)
-        self.drivetrain = drivetrain.Drivetrain()
+        self.drivetrain = revdrivetrain.Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
         self.xspeedLimiter = wpimath.filter.SlewRateLimiter(3)
@@ -61,6 +62,7 @@ class MyRobot(commands2.TimedCommandRobot):
         wpilib.SmartDashboard.putNumber("X Speed", self.xSpeed)
         wpilib.SmartDashboard.putNumber("Y Speed", self.ySpeed)
         wpilib.SmartDashboard.putNumber("Rotation", self.rot)
+        
         return super().robotPeriodic()
 
     def autonomousPeriodic(self) -> None:
