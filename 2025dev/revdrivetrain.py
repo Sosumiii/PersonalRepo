@@ -48,6 +48,12 @@ class swerveModule(commands2.Subsystem):
 
         self.driveEncoder = self.driveMotor.getEncoder()
         self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)
+
+        self.configurator2 = rev.SparkMaxConfig()
+
+        Config = self.configurator2.smartCurrentLimit(40)
+        self.configurator2.apply(Config)
+        
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
