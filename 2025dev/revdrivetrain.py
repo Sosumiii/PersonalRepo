@@ -26,18 +26,8 @@ def rpm2mps(rotations) -> float: #Converts from rotations per minute to meters p
     speed = rpsWithRatio * (2 * math.pi * kWheelRadius)
     return speed
 
-def deg2Rot2d(deg) -> float:
-    yaw = deg/360
-    return Rotation2d(yaw * math.pi * 2)
-
-def lratio(angle):
-    """converts -pi, pi to -.5,.5"""
-    return ((angle/math.pi)*.5)
-
-def getRobotVelocity(Gyro):
-    pass
-"""def ticks2rad(EncoderPositon):
-    return EncoderPositon * (2*math.pi)"""
+def ticks2rad(EncoderPositon):
+    return EncoderPositon * (2*math.pi)
 
 class swerveModule(commands2.Subsystem):
     def __init__(
@@ -108,10 +98,10 @@ class swerveModule(commands2.Subsystem):
         SwerveModuleState.optimize(newState, Rotation2d(self.rotationEncoder.get_absolute_position().value_as_double * (2 * math.pi)))
 
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
-        rotationOutput = self.rotationPIDController.calculate(self.rotationEncoder.get_absolute_position().value_as_double, newState.angle.radians())
+        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_position().value_as_double), newState.angle.radians())
 
-        self.driveMotor.set(driveOutput * 74)
-        self.rotationMotor.set(rotationOutput * 74)
+        self.driveMotor.set(driveOutput)
+        self.rotationMotor.set(rotationOutput)
 
         """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
         SmartDashboard.putNumber("Rotation motor setpoint", rotationOutput)
@@ -180,7 +170,7 @@ class Drivetrain(commands2.Subsystem):
         swerveModuleStates = self.kinematics.toSwerveModuleStates(discretizedSpeeds)
         
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 3.0
+            swerveModuleStates, 4.6
         )
 
         self.flSM.setState(swerveModuleStates[0])

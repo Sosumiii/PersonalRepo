@@ -15,7 +15,7 @@ kWheelRadius = 0.0508 #Wheel radius in Meters
 kDriveEncoderRes = 2048 #TalonFX Enocder Resolution
 kMaxAngularVelocity = math.pi
 kMaxAngularAcceleration = math.tau
-kGearRatio = 6
+kGearRatio = 6.75
 
 def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
     return (EncoderPosition * math.pi * (2*kWheelRadius) / (kDriveEncoderRes * kGearRatio))
@@ -187,7 +187,7 @@ class Drivetrain(commands2.Subsystem):
         swerveModuleStates = self.kinematics.toSwerveModuleStates(discretizedSpeeds)
         
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 3.0
+            swerveModuleStates, 4.72
         )
 
         self.flSM.setState(swerveModuleStates[0])
