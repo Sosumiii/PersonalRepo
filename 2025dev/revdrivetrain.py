@@ -46,15 +46,15 @@ class swerveModule(commands2.Subsystem):
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0.011,  # Proportional gain
-            0.0,   # Integral gain
-            0.0,   # Derivative gain
+            0.001,  # Proportional gain
+            0.00001,   # Integral gain
+            0.01,   # Derivative gain
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
-            0.011,  # Proportional gain
-            0.0,   # Integral gain
-            0.0,   # Derivative gain
+            0.001,  # Proportional gain
+            0.00001,   # Integral gain
+            0.01,   # Derivative gain
         )
 
         self.drivePIDController.enableContinuousInput(-math.pi, math.pi)
@@ -98,9 +98,9 @@ class swerveModule(commands2.Subsystem):
         SwerveModuleState.optimize(newState, Rotation2d(self.rotationEncoder.get_absolute_position().value_as_double * (2 * math.pi)))
 
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
-        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_position().value_as_double), newState.angle.radians())
+        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
 
-        self.driveMotor.set(driveOutput)
+        self.driveMotor.set(-driveOutput)
         self.rotationMotor.set(rotationOutput)
 
         """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
@@ -113,8 +113,8 @@ class swerveModule(commands2.Subsystem):
 
 
     def stopAllMotors(self):
-        self.driveMotor.set(0)
-        self.rotationMotor.set(0)
+        self.driveMotor.stopMotor()
+        self.rotationMotor.stopMotor()
 
 
 

@@ -16,6 +16,10 @@ class MyRobot(commands2.TimedCommandRobot):
         self.controller = wpilib.XboxController(0)
         self.swerve = revdrivetrain.Drivetrain()
 
+        self.timer = wpilib.Timer()
+
+        self.timer.start()
+
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
 
 
