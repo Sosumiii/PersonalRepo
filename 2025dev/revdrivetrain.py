@@ -34,6 +34,11 @@ def lratio(angle):
     """converts -pi, pi to -.5,.5"""
     return ((angle/math.pi)*.5)
 
+def getRobotVelocity(Gyro):
+    pass
+"""def ticks2rad(EncoderPositon):
+    return EncoderPositon * (2*math.pi)"""
+
 class swerveModule(commands2.Subsystem):
     def __init__(
         self,
@@ -47,13 +52,7 @@ class swerveModule(commands2.Subsystem):
         self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
 
         self.driveEncoder = self.driveMotor.getEncoder()
-        self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)
-
-        self.configurator2 = rev.SparkMaxConfig()
-
-        Config = self.configurator2.smartCurrentLimit(40)
-        self.configurator2.apply(Config)
-        
+        self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)                    
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
@@ -71,8 +70,8 @@ class swerveModule(commands2.Subsystem):
         self.drivePIDController.enableContinuousInput(-math.pi, math.pi)
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
 
-        #self.drivePIDController.setSetpoint(0.0)
-        #self.rotationPIDController.setSetpoint(0.0)
+        self.drivePIDController.setSetpoint(0.0)
+        self.rotationPIDController.setSetpoint(0.0)
         
         #Feed Forward Control
         #self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
@@ -87,7 +86,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModuleState(
             rpm2mps(self.driveEncoder.getVelocity()), #Gets the speed of the wheels in m/s
-            Rotation2d((self.rotationEncoder.get_absolute_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d((self.rotationEncoder.get_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
         )        
     
     def getPosition(self):
@@ -96,7 +95,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModulePosition(
             NEOtoDistance(self.driveEncoder.getPosition()), #gets the current position of the wheels
-            Rotation2d((self.rotationEncoder.get_absolute_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d((self.rotationEncoder.get_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
         )
     
     def setState(
@@ -111,11 +110,8 @@ class swerveModule(commands2.Subsystem):
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
         rotationOutput = self.rotationPIDController.calculate(self.rotationEncoder.get_absolute_position().value_as_double, newState.angle.radians())
 
-        driveOutput = max(min(driveOutput, 1.0), -1.0)
-        rotationOutput = max(min(rotationOutput, 1.0), -1.0)
-
-        self.driveMotor.set(driveOutput)
-        self.rotationMotor.set(rotationOutput)
+        self.driveMotor.set(driveOutput * 74)
+        self.rotationMotor.set(rotationOutput * 74)
 
         """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
         SmartDashboard.putNumber("Rotation motor setpoint", rotationOutput)
@@ -125,9 +121,6 @@ class swerveModule(commands2.Subsystem):
 
         print(f"Drive motor setpoint: {driveOutput} | Rotation motor setpoint: {rotationOutput}")
 
-        
-
-        
 
     def stopAllMotors(self):
         self.driveMotor.set(0)
@@ -175,7 +168,7 @@ class Drivetrain(commands2.Subsystem):
 
 
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rotation, deg2Rot2d(self.gyro.get_yaw().value_as_double)
+            xSpeed, ySpeed, rotation, self.gyro.getRotation2d()
         )
 
         # Discretize the chassis speeds
@@ -197,7 +190,7 @@ class Drivetrain(commands2.Subsystem):
 
     def updateOdometry(self):
         self.odometry.update(
-            deg2Rot2d(self.gyro.get_yaw().value_as_double),
+            self.gyro.getRotation2d(),
             (
             self.flSM.getPosition(),
             self.frSM.getPosition(),
