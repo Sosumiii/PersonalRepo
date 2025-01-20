@@ -32,18 +32,16 @@ class MyRobot(commands2.TimedCommandRobot):
     def autonomousPeriodic(self) -> None:
         self.swerve.updateOdometry()
 
+    def applyDeadband(self, value, deadband=0.15):
+        return value if abs(value) > deadband else 0
+
     def teleopPeriodic(self) -> None:
         
-        self.xSpeed = self.controller.getLeftY()
-        self.ySpeed = self.controller.getLeftX()
-        self.rot = self.controller.getRightX()
-
-        if abs(self.xSpeed) <.15:
-            self.xSpeed=0
-        if abs(self.ySpeed) <.15:
-            self.ySpeed=0
-        if abs(self.rot) <.15:
-            self.rot=0
+        
+        self.xSpeed = self.applyDeadband(self.controller.getLeftY())
+        self.ySpeed = self.applyDeadband(self.controller.getLeftX())
+        self.rot = self.applyDeadband(self.controller.getRightX())
+        
 
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
             self.swerve.stopDrivetrain()

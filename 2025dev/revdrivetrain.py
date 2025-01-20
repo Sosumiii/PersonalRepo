@@ -57,10 +57,7 @@ class swerveModule(commands2.Subsystem):
             0.01,   # Derivative gain
         )
 
-        self.drivePIDController.enableContinuousInput(-math.pi, math.pi)
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
-
-        self.drivePIDController.setSetpoint(0.0)
         self.rotationPIDController.setSetpoint(0.0)
         
         #Feed Forward Control
