@@ -43,16 +43,17 @@ class swerveModule(commands2.Subsystem):
 
         self.driveEncoder = self.driveMotor.getEncoder()
         self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)                    
+
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0.001,  # Proportional gain
+            0.0001,  # Proportional gain
             0.00001,   # Integral gain
             0.01,   # Derivative gain
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
-            0.001,  # Proportional gain
+            0.0001,  # Proportional gain
             0.00001,   # Integral gain
             0.01,   # Derivative gain
         )
@@ -61,8 +62,8 @@ class swerveModule(commands2.Subsystem):
         self.rotationPIDController.setSetpoint(0.0)
         
         #Feed Forward Control
-        #self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
-        #self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 0.5)
+        self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
+        self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 0.5)
 
 
         super().__init__()
@@ -97,7 +98,7 @@ class swerveModule(commands2.Subsystem):
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
         rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
 
-        self.driveMotor.set(-driveOutput)
+        self.driveMotor.set(-newState.speed)
         self.rotationMotor.set(rotationOutput)
 
         """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
