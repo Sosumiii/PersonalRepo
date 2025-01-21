@@ -5,11 +5,10 @@ import wpilib
 import commands2
 import wpimath.controller
 import wpimath.kinematics
-import wpimath.trajectory
 import wpimath.units
-from wpilib import DriverStation, SmartDashboard
-from wpimath.geometry import Pose2d, Rotation2d, Translation2d
-from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState, SwerveModulePosition
+from wpimath.geometry import Rotation2d
+from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
+
 
 kWheelRadius = 0.0508 #Wheel radius in Meters
 kDriveEncoderRes = 4096 #SparkMAX Enocder Resolution
@@ -98,6 +97,7 @@ class swerveModule(commands2.Subsystem):
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
         rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
 
+        #self.driveMotor.set(driveOutput)
         self.driveMotor.set(-newState.speed)
         self.rotationMotor.set(rotationOutput)
 
@@ -113,82 +113,3 @@ class swerveModule(commands2.Subsystem):
     def stopAllMotors(self):
         self.driveMotor.stopMotor()
         self.rotationMotor.stopMotor()
-
-
-
-class Drivetrain(commands2.Subsystem):
-    def __init__(self):
-
-        #SwerveModule/hardware init
-        self.flSM = swerveModule(2, 1, 13)
-        self.frSM = swerveModule(4, 3, 11)
-        self.blSM = swerveModule(8, 7, 12)
-        self.brSM = swerveModule(6, 5, 10)
-
-        self.gyro = phoenix6.hardware.Pigeon2(14)
-        self.gyro.set_yaw(0)
-
-        #Location init for kinematics
-        frontLeft = Translation2d(.324, .324)
-        frontRight = Translation2d(.324, -.324)
-        backLeft = Translation2d(-.324, .324)
-        backRight = Translation2d(-.324, -.324)
-
-        self.kinematics = SwerveDrive4Kinematics(frontLeft, frontRight, backLeft, backRight)
-
-        #Odometry setup
-        self.odometry = SwerveDrive4Odometry(
-            self.kinematics,
-            Rotation2d(),
-            (
-                self.flSM.getPosition(),
-                self.frSM.getPosition(),
-                self.blSM.getPosition(),
-                self.brSM.getPosition()
-            ),
-            Pose2d()
-        )
-
-        super().__init__()
-
-    def drive(self, xSpeed, ySpeed, rotation, periodSeconds) -> None:
-        #Method to drive the bot using an Xbox Controller.
-
-
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rotation, self.gyro.getRotation2d()
-        )
-
-        # Discretize the chassis speeds
-        discretizedSpeeds = ChassisSpeeds.discretize(
-            chassisSpeeds, periodSeconds
-        )
-
-        # Convert to swerve module states
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(discretizedSpeeds)
-        
-        SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 4.6
-        )
-
-        self.flSM.setState(swerveModuleStates[0])
-        self.frSM.setState(swerveModuleStates[1])
-        self.blSM.setState(swerveModuleStates[2])
-        self.brSM.setState(swerveModuleStates[3])
-
-    def updateOdometry(self):
-        self.odometry.update(
-            self.gyro.getRotation2d(),
-            (
-            self.flSM.getPosition(),
-            self.frSM.getPosition(),
-            self.blSM.getPosition(),
-            self.brSM.getPosition()
-            ),
-        )        
-
-    def stopDrivetrain(self):
-        self.flSM.stopAllMotors()
-        self.frSM.stopAllMotors()
-        self.blSM.stopAllMotors()
-        self.brSM.stopAllMotors()
