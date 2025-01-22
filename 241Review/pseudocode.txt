@@ -1,9 +1,0 @@
-While the index is less than the length of everything in the document
-    set individualword to blank
-    while substring does not equal a blank character (use variable i)
-        append the current substring to individualword
-        add 1 to i
-    check individualword against a database of words.
-    add the value of the word to a globle count.
-
-
