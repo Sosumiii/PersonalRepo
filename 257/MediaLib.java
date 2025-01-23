@@ -6,10 +6,21 @@
 public class MediaLib
 {
   private Book book;
+  private Movie movie;
 
   public void addBook(Book b)
   {
     book = b;
+  }
+
+  public void addMovie(Movie m)
+  {
+    movie = m;
+  }
+
+  public void testBook(Book tester)
+  {
+    book = tester;
   }
 
   public String toString() 
@@ -20,7 +31,12 @@ public class MediaLib
       info += book;
       return info;
     }
-    
+    else if (movie != null)
+    {
+      String info = "";
+      info += movie;
+      return info;
+    }
     else
     {
       return "";

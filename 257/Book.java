@@ -40,6 +40,12 @@ public class Book
     return info;
   }
 
+  public Boolean Equals(Book b)
+  {
+      return (title.equals(b.title) && author.equals(b.author));
+  }
+
+
   /*** Mutator methods ***/
   public void setTitle(String t) {
     title = t;
