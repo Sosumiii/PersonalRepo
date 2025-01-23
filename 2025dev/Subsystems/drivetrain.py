@@ -76,7 +76,7 @@ class Drivetrain(commands2.Subsystem):
                 self.blSM.getPosition,
                 self.brSM.getPosition,
             ),
-            Pose2d
+            Pose2d()
         )
 
 
@@ -120,8 +120,9 @@ class Drivetrain(commands2.Subsystem):
                 periodSeconds,
             )
         )
+
         wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
+            swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
         )
         
         """self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
