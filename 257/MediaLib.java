@@ -14,8 +14,16 @@ public class MediaLib
 
   public String toString() 
   {
-    String info = book.getTitle();
+    if (book != null)
+    {
+      String info = "";
+      info += book;
+      return info;
+    }
     
-    return info;
+    else
+    {
+      return "";
+    }
   }
 }

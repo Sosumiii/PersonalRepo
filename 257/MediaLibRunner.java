@@ -10,9 +10,17 @@ public class MediaLibRunner
     System.out.println("Welcome to your Media Library");
     MediaLib myLib = new MediaLib();
     Book myBook = new Book("The Lord of the Rings", "Tolkien");
-    System.out.println("Book created: " + myBook);
+
+    System.out.println("Library: " + myLib);
 
     myLib.addBook(myBook);
+    System.out.println("Library: " + myLib);
+
+
+    int myRating = 5;
+    myBook.adjustRating(myRating);
+    System.out.println(myBook);
+
 
   }
 }
