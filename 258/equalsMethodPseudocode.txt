@@ -1,0 +1,8 @@
+Create a boolean method that checks if two books are the same
+
+Boolean Book(new Book)
+    if the new book has the same title and author as the current book:
+        Return True
+    else:
+        Return False
+
