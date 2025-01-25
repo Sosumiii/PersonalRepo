@@ -30,9 +30,9 @@ class MyRobot(commands2.TimedCommandRobot):
 
         self.orchestra.add_instrument(self.motor)
 
-        status = self.orchestra.load_music("ievanpolkka.chrp")
+        self.status = self.orchestra.load_music("ievanpolkka.chrp")
 
-        if not status.is_ok():
+        if not self.status.is_ok():
             print("DONT PLAY IT PLZ")
 
 
@@ -105,6 +105,11 @@ class MyRobot(commands2.TimedCommandRobot):
         elif (self.controller.getLeftBumperButton()):
             self.orchestra.stop()
 
+        if (self.controller.getYButton()):
+            print(self.status.is_ok())
+            print(self.status.is_error())
+            print(self.status.is_warning())
+            
         if (self.controller.getXButton()):
             print(self.orchestra.is_playing())
         
