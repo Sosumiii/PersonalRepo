@@ -7,11 +7,6 @@ public class MediaLib
 {
   private Book book;
   private Movie movie;
-  private Song song;
-  private static int getNumEntries = 0;
-  private static int countBook = 0;
-  private static int countMovie = 0;
-  private static int countSong = 0;
   public static String owner = "PLTW";
 
   public static String getOwner()
@@ -19,58 +14,20 @@ public class MediaLib
     return owner;
   }
   
-  public static void changeOwner(String newOwner)
+  public void changeOwner(String newOwner)
   {
     owner = newOwner;
   }
 
-  public static int getNumEntries()
-  {
-    // System.out.println("Test: Owner is " + owner);
-    return getNumEntries;
-  }
   public void addBook(Book b)
   {
-    if (countBook == 0)
-    {
-      book = b;
-      getNumEntries++;
-      countBook++;
-    }
-    else
-    {
-      System.out.println("Cannot add more books.");
-    }
+    book = b;
   }
 
   public void addMovie(Movie m)
   {
-    if (countMovie ==  0)
-    {
-      movie = m;
-      getNumEntries++;
-      countMovie++;
-    }
-    else
-    {
-      System.out.println("Cannot add more movies.");
-    }
+    movie = m;
   }
-
-  public void addSong(Song s)
-  {
-    if (countSong ==  0)
-    {
-      song = s;
-      getNumEntries++;
-      countSong++;
-    }
-    else
-    {
-      System.out.println("Cannot add more songs.");
-    }
-  }
-
 
   public void testBook(Book tester)
   {
@@ -89,12 +46,6 @@ public class MediaLib
     {
       String info = "";
       info += movie;
-      return info;
-    }
-    else if (song != null)
-    {
-      String info = "";
-      info += song;
       return info;
     }
     else
