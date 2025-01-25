@@ -4,6 +4,7 @@ import pathplannerlib.auto
 import pathplannerlib.config
 import wpilib
 import wpilib.simulation
+import phoenix6
 import wpimath
 import wpilib.drive
 import wpimath.filter
@@ -22,8 +23,18 @@ class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
         self.controller = wpilib.XboxController(0)
-        self.drivetrain = drivetrain.Drivetrain()
+        #self.drivetrain = drivetrain.Drivetrain()
         #self.config = RobotConfig.fromGUISettings() #Make a pathplanner project in this directory first before uncommenting this line.
+        self.motor = phoenix6.hardware.TalonFX(0)
+        self.orchestra = phoenix6.Orchestra()
+
+        self.orchestra.add_instrument(self.motor)
+
+        status = self.orchestra.load_music("ievanpolkka.chrp")
+
+        if not status.is_ok():
+            print("DONT PLAY IT PLZ")
+
 
         self.timer = wpilib.Timer()
 
@@ -31,7 +42,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
 
-    def configureAuto(self):
+    """ def configureAuto(self):
         AutoBuilder.configure(
             self.drivetrain.odometry.getPose,
             self.drivetrain.reset,
@@ -44,7 +55,7 @@ class MyRobot(commands2.TimedCommandRobot):
             self.config,
             self.drivetrain.shouldFlipPath,
             self.drivetrain
-        )
+        ) """
 
 
     def robotPeriodic(self): 
@@ -55,7 +66,7 @@ class MyRobot(commands2.TimedCommandRobot):
         #self.field.setRobotPose(self.odometry.getPose())
         #self.swerve.updateOdometry()
         
-        wpilib.SmartDashboard.putNumber("FLD Current", self.drivetrain.flSM.driveMotor.getOutputCurrent())
+        """ wpilib.SmartDashboard.putNumber("FLD Current", self.drivetrain.flSM.driveMotor.getOutputCurrent())
         wpilib.SmartDashboard.putNumber("FLR Current", self.drivetrain.flSM.rotationMotor.getOutputCurrent())
         
         wpilib.SmartDashboard.putNumber("FRD Current", self.drivetrain.frSM.driveMotor.getOutputCurrent())
@@ -65,22 +76,42 @@ class MyRobot(commands2.TimedCommandRobot):
         wpilib.SmartDashboard.putNumber("BLR Current", self.drivetrain.blSM.rotationMotor.getOutputCurrent())
 
         wpilib.SmartDashboard.putNumber("BRD Current", self.drivetrain.brSM.driveMotor.getOutputCurrent())
-        wpilib.SmartDashboard.putNumber("BRR Current", self.drivetrain.brSM.rotationMotor.getOutputCurrent())
+        wpilib.SmartDashboard.putNumber("BRR Current", self.drivetrain.brSM.rotationMotor.getOutputCurrent()) """
 
         
 
         return super().robotPeriodic()
 
-    def autonomousPeriodic(self) -> None:
-        self.drivetrain.updateOdometry()
+    """ def autonomousPeriodic(self) -> None:
+        self.drivetrain.updateOdometry() """
 
     def applyDeadband(self, value, deadband=0.15):
         return value if abs(value) > deadband else 0
 
     def teleopPeriodic(self) -> None:
         
+        if (self.controller.getAButton()):
+            self.motor.setVoltage(0.5)
+            print("A")
+        elif (self.controller.getBButton()):
+            self.motor.setVoltage(0.5)
+            print("B")
+        else:
+            self.motor.stopMotor()
+
+        if (self.controller.getRightBumperButton()):
+            self.orchestra.play()
+            print("Bumper")
+        elif (self.controller.getLeftBumperButton()):
+            self.orchestra.stop()
+
+        if (self.controller.getXButton()):
+            print(self.orchestra.is_playing())
         
-        self.xSpeed = self.applyDeadband(self.controller.getLeftY())
+        
+        
+        
+        """ self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
         self.rot = self.applyDeadband(self.controller.getRightX())
         
@@ -88,9 +119,9 @@ class MyRobot(commands2.TimedCommandRobot):
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
             self.drivetrain.stopDrivetrain()
         else:
-            self.driveWithJoystick()
+            self.driveWithJoystick() """
 
             
             
-    def driveWithJoystick(self) -> None:
-        self.drivetrain.driveFO(self.xSpeed, self.ySpeed, self.rot, self.getPeriod())
+    """ def driveWithJoystick(self) -> None:
+        self.drivetrain.driveFO(self.xSpeed, self.ySpeed, self.rot, self.getPeriod()) """

@@ -30,6 +30,21 @@
         "header": {
           "open": true
         }
+      },
+      "Talon FX (v6)[0]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[0]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[0]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
