@@ -69,12 +69,12 @@ class Drivetrain(commands2.Subsystem):
         self.gyro.set_yaw(0)
 
         self.odometry.resetPosition(
-            self.gyro.getRotation2d,
+            self.gyro.getRotation2d(),
             (
-                self.flSM.getPosition,
-                self.frSM.getPosition,
-                self.blSM.getPosition,
-                self.brSM.getPosition,
+                self.flSM.getPosition(),
+                self.frSM.getPosition(),
+                self.blSM.getPosition(),
+                self.brSM.getPosition(),
             ),
             Pose2d()
         )
@@ -91,20 +91,18 @@ class Drivetrain(commands2.Subsystem):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
 
-    def drive(self, 
+    def driveFO(self, 
         xSpeed: float, 
         ySpeed: float, 
-        rotation: float, 
-        fieldRelative: bool, 
+        rotation: float,  
         periodSeconds: float
     ) -> None:
         
         """
-        Method to drive the robot using joystick info.
+        Method to drive the robot in Field Relative mode.
         :param xSpeed: Speed of the robot in the x direction (forward).
         :param ySpeed: Speed of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
-        :param fieldRelative: Whether the provided x and y speeds are relative to the field.
         :param periodSeconds: Time
         """
 
@@ -113,9 +111,7 @@ class Drivetrain(commands2.Subsystem):
                 (
                     wpimath.kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(
                         xSpeed, ySpeed, rotation, self.gyro.getRotation2d()
-                    )
-                    if fieldRelative
-                    else wpimath.kinematics.ChassisSpeeds(xSpeed, ySpeed, rotation)
+                    ) 
                 ),
                 periodSeconds,
             )
@@ -141,6 +137,30 @@ class Drivetrain(commands2.Subsystem):
             swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
         )
 """
+        self.flSM.setState(swerveModuleStates[0])
+        self.frSM.setState(swerveModuleStates[1])
+        self.blSM.setState(swerveModuleStates[2])
+        self.brSM.setState(swerveModuleStates[3])
+        
+    def driveRO(self, 
+        xSpeed: float, 
+        ySpeed: float, 
+        rotation: float,  
+    ) -> None:
+        
+        """
+        Method to drive the robot in Robot Relative mode.
+        :param xSpeed: Speed of the robot in the x direction (forward).
+        :param ySpeed: Speed of the robot in the y direction (sideways).
+        :param rot: Angular rate of the robot.
+        """
+        
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(wpimath.kinematics.ChassisSpeeds(xSpeed, ySpeed, rotation))
+        
+        wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
+            swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
+        )
+        
         self.flSM.setState(swerveModuleStates[0])
         self.frSM.setState(swerveModuleStates[1])
         self.blSM.setState(swerveModuleStates[2])

@@ -39,6 +39,10 @@ class swerveModule(commands2.Subsystem):
         RotationEncoderID: int
         ) -> None:
         
+        """
+        Initalizes an instance of a swerve module.       
+        """
+        
         #Hardware init
         self.driveMotor = rev.SparkMax(DriveMotorID, rev.SparkMax.MotorType.kBrushless)
         self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
@@ -55,9 +59,9 @@ class swerveModule(commands2.Subsystem):
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
-            0.001,  # Proportional gain
+            0.0001,  # Proportional gain
             0.00,   # Integral gain
-            0.001,   # Derivative gain
+            0.00,   # Derivative gain
         )
 
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
@@ -95,7 +99,6 @@ class swerveModule(commands2.Subsystem):
         """
         Sets a new state for the swerve module to move to.
         """
-
         encoderRotation = Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double))
         
         newState.optimize(encoderRotation)
