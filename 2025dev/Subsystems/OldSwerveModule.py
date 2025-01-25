@@ -19,9 +19,6 @@ kGearRatio = 6.75
 def NEOtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
     return (EncoderPosition * math.pi * (2*kWheelRadius) / (kDriveEncoderRes * kGearRatio))
 
-def rps2mps(RotationsPerSecond):
-    return ()
-
 def rpm2mps(rotations) -> float: #Converts from rotations per minute to meters per Second
     rps = rotations / 60.0
     rpsWithRatio = rps / kGearRatio
@@ -53,15 +50,20 @@ class swerveModule(commands2.Subsystem):
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0.001,  # Proportional gain
-            0.00,   # Integral gain
-            0.001,   # Derivative gain
+            0.0001,  # Proportional gain
+            0.00001,   # Integral gain
+            0.01,   # Derivative gain
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
             0.0001,  # Proportional gain
+<<<<<<< HEAD
             0.00,   # Integral gain
             0.00,   # Derivative gain
+=======
+            0.00001,   # Integral gain
+            0.01,   # Derivative gain
+>>>>>>> parent of 0d9db35 (Feedforward controls for rotation motor.)
         )
 
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
@@ -80,7 +82,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModuleState(
             rpm2mps(self.driveEncoder.getVelocity()), #Gets the speed of the wheels in m/s
-            Rotation2d((self.rotationEncoder.get_absolute_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d((self.rotationEncoder.get_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
         )        
     
     def getPosition(self):
@@ -89,7 +91,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModulePosition(
             NEOtoDistance(self.driveEncoder.getPosition()), #gets the current position of the wheels
-            Rotation2d((self.rotationEncoder.get_absolute_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d((self.rotationEncoder.get_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
         )
     
     def setState(
@@ -99,19 +101,21 @@ class swerveModule(commands2.Subsystem):
         """
         Sets a new state for the swerve module to move to.
         """
+<<<<<<< HEAD
         encoderRotation = Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double))
         
         newState.optimize(encoderRotation)
         newState.cosineScale(encoderRotation)
+=======
+        SwerveModuleState.optimize(newState, Rotation2d(self.rotationEncoder.get_absolute_position().value_as_double * (2 * math.pi)))
+>>>>>>> parent of 0d9db35 (Feedforward controls for rotation motor.)
 
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
-
         rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
-        rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
         #self.driveMotor.set(driveOutput)
-        self.driveMotor.set(newState.speed)
-        self.rotationMotor.setVoltage(rotationOutput + rotationFF)
+        self.driveMotor.set(-newState.speed)
+        self.rotationMotor.set(rotationOutput)
 
         """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
         SmartDashboard.putNumber("Rotation motor setpoint", rotationOutput)
@@ -119,7 +123,7 @@ class swerveModule(commands2.Subsystem):
         SmartDashboard.putNumber("Rotation motor actual setpoint", self.rotationEncoder.get_absolute_position().value_as_double)"""
 
 
-        print(f"Drive motor setpoint: {driveOutput} | Rotation motor requested voltage: {rotationOutput + rotationFF}")
+        print(f"Drive motor setpoint: {driveOutput} | Rotation motor setpoint: {rotationOutput}")
 
 
     def stopAllMotors(self):
