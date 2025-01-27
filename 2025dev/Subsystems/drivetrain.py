@@ -127,7 +127,7 @@ class Drivetrain(commands2.Subsystem):
         ) """
 
         # Convert to swerve module states
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(chassisSpeeds)
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(self.chassisSpeeds)
         
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
