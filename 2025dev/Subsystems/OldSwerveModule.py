@@ -45,8 +45,7 @@ class swerveModule(commands2.Subsystem):
         self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
 
         self.driveEncoder = self.driveMotor.getEncoder()
-        self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)                
-
+        self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
@@ -56,9 +55,9 @@ class swerveModule(commands2.Subsystem):
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
-            2,  # Proportional gain
+            0.5,  # Proportional gain
             0.00,   # Integral gain
-            0.00,   # Derivative gain
+            0.05,   # Derivative gain
         )
 
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
@@ -66,7 +65,7 @@ class swerveModule(commands2.Subsystem):
         
         #Feed Forward Control
         self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
-        self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardRadians(1, 0.5)
+        self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardRadians(1, 0.2)
 
 
         super().__init__()
@@ -114,9 +113,12 @@ class swerveModule(commands2.Subsystem):
         SmartDashboard.putNumber("Rotation motor setpoint", rotationOutput)
         SmartDashboard.putNumber("Drive motor actual position", self.driveEncoder.getPosition)
         SmartDashboard.putNumber("Rotation motor actual setpoint", self.rotationEncoder.get_absolute_position().value_as_double)"""
+        
+        print(rotationOutput)
 
 
-        print(f"newSpeed: {newState.speed}")
+
+        
 
 
     def stopAllMotors(self):

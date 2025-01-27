@@ -71,21 +71,19 @@ class MyRobot(commands2.TimedCommandRobot):
         wpilib.SmartDashboard.putNumber("Rotation", self.rot)"""
         #SmartDashboard.putData("Field", self.field)
         #self.field.setRobotPose(self.odometry.getPose())
-        #self.swerve.updateOdometry()
-
-        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])
+        #self.swerve.updateOdometry()        
+        wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
         
-        wpilib.SmartDashboard.putNumber("FLD Current", self.drivetrain.flSM.driveMotor.getOutputCurrent())
-        wpilib.SmartDashboard.putNumber("FLR Current", self.drivetrain.flSM.rotationMotor.getOutputCurrent())
-        
-        wpilib.SmartDashboard.putNumber("FRD Current", self.drivetrain.frSM.driveMotor.getOutputCurrent())
-        wpilib.SmartDashboard.putNumber("FRR Current", self.drivetrain.frSM.rotationMotor.getOutputCurrent())
+        wpilib.SmartDashboard.putNumber("FRD Temp", self.drivetrain.frSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("FRR Temp", self.drivetrain.frSM.rotationMotor.getMotorTemperature())
 
-        wpilib.SmartDashboard.putNumber("BLD Current", self.drivetrain.blSM.driveMotor.getOutputCurrent())
-        wpilib.SmartDashboard.putNumber("BLR Current", self.drivetrain.blSM.rotationMotor.getOutputCurrent())
+        wpilib.SmartDashboard.putNumber("BLD Temp", self.drivetrain.blSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("BLR Temp", self.drivetrain.blSM.rotationMotor.getMotorTemperature())
 
-        wpilib.SmartDashboard.putNumber("BRD Current", self.drivetrain.brSM.driveMotor.getOutputCurrent())
-        wpilib.SmartDashboard.putNumber("BRR Current", self.drivetrain.brSM.rotationMotor.getOutputCurrent())
+        wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
+
 
         
 
@@ -123,6 +121,8 @@ class MyRobot(commands2.TimedCommandRobot):
             print(self.orchestra.is_playing()) """
         
         
+        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])
+
         
         
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
@@ -138,4 +138,4 @@ class MyRobot(commands2.TimedCommandRobot):
             
             
     def driveWithJoystick(self) -> None:
-        self.drivetrain.driveFO(-self.xSpeed, self.ySpeed, self.rot, self.getPeriod())
+        self.drivetrain.driveFO(self.xSpeed, self.ySpeed, self.rot)

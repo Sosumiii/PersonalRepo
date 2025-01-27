@@ -11,8 +11,6 @@ from wpilib import DriverStation
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds
 
-from wpilib import DriverStation
-
 """Please Select which version of the Swerve Code that you want to use and the configs related to them"""
 #import Subsystems.NewSwerveModule as SM
 import Subsystems.OldSwerveModule as SM
@@ -24,8 +22,8 @@ class Drivetrain(commands2.Subsystem):
 
         #Old Swerve Configs
         self.flSM = SM.swerveModule(1, 2, 10)
-        self.frSM = SM.swerveModule(3, 4, 11)
-        self.blSM = SM.swerveModule(5, 6, 12)
+        self.frSM = SM.swerveModule(3, 4, 12)
+        self.blSM = SM.swerveModule(5, 6, 11)
         self.brSM = SM.swerveModule(7, 8, 13)
 
         #New Swerve Configs
@@ -37,7 +35,7 @@ class Drivetrain(commands2.Subsystem):
         self.gyro = phoenix6.hardware.Pigeon2(14)
         self.gyro.set_yaw(0)
 
-        #self.chassisSpeeds = ChassisSpeeds(0, 0, 0)
+        self.chassisSpeeds = ChassisSpeeds(0, 0, 0)
 
         #Location init for kinematics
         frontLeft = Translation2d(.324, .324)
@@ -79,12 +77,11 @@ class Drivetrain(commands2.Subsystem):
             Pose2d()
         )
 
-
-    def getChassisSpeed(self):
+    def getChassisSpeeds(self):
         return self.chassisSpeeds
 
 
-    def shouldFlipPath():
+    def shouldFlipPath(self):
         # Boolean supplier that controls when the path will be mirrored for the red alliance
         # This will flip the path being followed to the red side of the field.
         # THE ORIGIN WILL REMAIN ON THE BLUE SIDE
@@ -95,7 +92,7 @@ class Drivetrain(commands2.Subsystem):
         xSpeed: float, 
         ySpeed: float, 
         rotation: float,  
-        periodSeconds: float
+        #periodSeconds: float
     ) -> None:
         
         """
@@ -120,17 +117,17 @@ class Drivetrain(commands2.Subsystem):
             swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
         ) """
         
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             xSpeed, ySpeed, rotation, self.gyro.getRotation2d()
         )
 
         # Discretize the chassis speeds
-        discretizedSpeeds = ChassisSpeeds.discretize(
+        """ discretizedSpeeds = ChassisSpeeds.discretize(
             chassisSpeeds, periodSeconds
-        )
+        ) """
 
         # Convert to swerve module states
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(discretizedSpeeds)
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(chassisSpeeds)
         
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
@@ -140,6 +137,8 @@ class Drivetrain(commands2.Subsystem):
         self.frSM.setState(swerveModuleStates[1])
         self.blSM.setState(swerveModuleStates[2])
         self.brSM.setState(swerveModuleStates[3])
+        
+
         
     def driveRO(self, 
         xSpeed: float, 
@@ -153,8 +152,9 @@ class Drivetrain(commands2.Subsystem):
         :param ySpeed: Speed of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
         """
+        self.chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(xSpeed, ySpeed, rotation, self.gyro.getRotation2d())
         
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(wpimath.kinematics.ChassisSpeeds(xSpeed, ySpeed, rotation))
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(self.chassisSpeeds)
         
         wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed

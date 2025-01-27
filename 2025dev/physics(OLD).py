@@ -25,8 +25,10 @@ class PhysicsEngine:
         self.motorTalon_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearboxTalon, 0.01, 6.75), gearboxTalon)
         self.motorNEODrive_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearboxNEO, 0.01, 6.75), gearboxNEO)
         # Keep a reference to the motor sim state so we can update it
-        self.NEOsim = rev.SparkMaxSim(robot.drivetrain.flSM.driveMotor, gearboxNEO)
-
+        self.NEO1sim = rev.SparkMaxSim(robot.drivetrain.flSM.driveMotor, gearboxNEO)
+        self.NEO2sim = rev.SparkMaxSim(robot.drivetrain.frSM.driveMotor, gearboxNEO)
+        self.NEO3sim = rev.SparkMaxSim(robot.drivetrain.blSM.driveMotor, gearboxNEO)
+        self.NEO4sim = rev.SparkMaxSim(robot.drivetrain.brSM.driveMotor, gearboxNEO)
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         """
