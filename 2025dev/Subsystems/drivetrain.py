@@ -23,10 +23,10 @@ class Drivetrain(commands2.Subsystem):
         #SwerveModule/hardware init
 
         #Old Swerve Configs
-        self.flSM = SM.swerveModule(2, 1, 13)
-        self.frSM = SM.swerveModule(4, 3, 11)
-        self.blSM = SM.swerveModule(8, 7, 12)
-        self.brSM = SM.swerveModule(6, 5, 10)
+        self.flSM = SM.swerveModule(1, 2, 10)
+        self.frSM = SM.swerveModule(3, 4, 11)
+        self.blSM = SM.swerveModule(5, 6, 12)
+        self.brSM = SM.swerveModule(7, 8, 13)
 
         #New Swerve Configs
         """self.flSM = SM.swerveModule(0, 1, 0)
@@ -37,7 +37,7 @@ class Drivetrain(commands2.Subsystem):
         self.gyro = phoenix6.hardware.Pigeon2(14)
         self.gyro.set_yaw(0)
 
-        self.chassisSpeeds = ChassisSpeeds(0, 0, 0)
+        #self.chassisSpeeds = ChassisSpeeds(0, 0, 0)
 
         #Location init for kinematics
         frontLeft = Translation2d(.324, .324)
@@ -76,7 +76,7 @@ class Drivetrain(commands2.Subsystem):
                 self.blSM.getPosition(),
                 self.brSM.getPosition(),
             ),
-            Pose2d
+            Pose2d()
         )
 
 
@@ -106,7 +106,7 @@ class Drivetrain(commands2.Subsystem):
         :param periodSeconds: Time
         """
 
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(
+        """ swerveModuleStates = self.kinematics.toSwerveModuleStates(
             wpimath.kinematics.ChassisSpeeds.discretize(
                 (
                     wpimath.kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -118,15 +118,15 @@ class Drivetrain(commands2.Subsystem):
         )
         wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
-        )
+        ) """
         
-        """self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             xSpeed, ySpeed, rotation, self.gyro.getRotation2d()
         )
 
         # Discretize the chassis speeds
         discretizedSpeeds = ChassisSpeeds.discretize(
-            self.chassisSpeeds, periodSeconds
+            chassisSpeeds, periodSeconds
         )
 
         # Convert to swerve module states
@@ -135,7 +135,7 @@ class Drivetrain(commands2.Subsystem):
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 3.5 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
         )
-"""
+
         self.flSM.setState(swerveModuleStates[0])
         self.frSM.setState(swerveModuleStates[1])
         self.blSM.setState(swerveModuleStates[2])

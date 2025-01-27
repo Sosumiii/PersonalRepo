@@ -125,9 +125,9 @@ class swerveModule(commands2.Subsystem):
 
         #self.driveMotor.set(driveOutput)
         self.driveMotor.set(newState.speed)
+        self.rotationMotor.setVoltage(rotationOutput + rotationFF)
         #self.rotationMotor.set(rotationOutput)
 
-        print(str(self.rotationMotor.get()))
         
 
     def stopAllMotors(self):

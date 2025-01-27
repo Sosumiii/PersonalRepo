@@ -7,6 +7,7 @@ from wpimath.units import radiansToRotations
 from pyfrc.physics.core import PhysicsInterface
 from phoenix6 import unmanaged
 
+import rev
 import typing
 
 if typing.TYPE_CHECKING:
@@ -19,10 +20,13 @@ class PhysicsEngine:
         self.physics_controller = physics_controller
 
         # Create a DCMotorSim for physics sim
-        gearbox = DCMotor.krakenX60FOC(1)
-        self.motor_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearbox, 0.01, 1.0), gearbox)
+        gearboxTalon = DCMotor.krakenX60FOC(4)
+        gearboxNEO = DCMotor.NEO(4)
+        self.motorTalon_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearboxTalon, 0.01, 6.75), gearboxTalon)
+        self.motorNEODrive_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearboxNEO, 0.01, 6.75), gearboxNEO)
         # Keep a reference to the motor sim state so we can update it
-        self.talon_sim = robot.motor.sim_state
+        self.NEOsim = rev.SparkMaxSim(robot.drivetrain.flSM.driveMotor, gearboxNEO)
+
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         """
@@ -37,8 +41,12 @@ class PhysicsEngine:
         if DriverStation.isEnabled():
             unmanaged.feed_enable(100)
 
-        self.talon_sim.set_supply_voltage(RobotController.getBatteryVoltage())
+        self.NEOsim.setBusVoltage(RobotController.getBatteryVoltage())
+        self.motorNEODrive_sim.setInputVoltage(self.NEOsim.getBusVoltage())
+
+        """ self.talon_sim.set_supply_voltage(RobotController.getBatteryVoltage())
         self.motor_sim.setInputVoltage(self.talon_sim.motor_voltage)
         self.motor_sim.update(tm_diff)
         self.talon_sim.set_raw_rotor_position(radiansToRotations(self.motor_sim.getAngularPosition()))
         self.talon_sim.set_rotor_velocity(radiansToRotations(self.motor_sim.getAngularVelocity()))
+ """

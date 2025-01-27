@@ -45,18 +45,18 @@ class swerveModule(commands2.Subsystem):
         self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
 
         self.driveEncoder = self.driveMotor.getEncoder()
-        self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)                    
+        self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)                
 
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
             0.0001,  # Proportional gain
-            0.00001,   # Integral gain
-            0.01,   # Derivative gain
+            0.00,   # Integral gain
+            0.0,   # Derivative gain
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
-            0.0001,  # Proportional gain
+            2,  # Proportional gain
             0.00,   # Integral gain
             0.00,   # Derivative gain
         )
@@ -66,7 +66,7 @@ class swerveModule(commands2.Subsystem):
         
         #Feed Forward Control
         self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
-        self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 0.5)
+        self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardRadians(1, 0.5)
 
 
         super().__init__()
@@ -77,7 +77,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModuleState(
             rpm2mps(self.driveEncoder.getVelocity()), #Gets the speed of the wheels in m/s
-            Rotation2d((self.rotationEncoder.get_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)) #Converts the position into radians as rotation2d requests
         )        
     
     def getPosition(self):
@@ -86,7 +86,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModulePosition(
             NEOtoDistance(self.driveEncoder.getPosition()), #gets the current position of the wheels
-            Rotation2d((self.rotationEncoder.get_position().value_as_double * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)) #Converts the position into radians as rotation2d requests
         )
     
     def setState(
@@ -98,15 +98,17 @@ class swerveModule(commands2.Subsystem):
         """
         encoderRotation = Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double))
         
-        newState.optimize(encoderRotation)
-        newState.cosineScale(encoderRotation)
+        SwerveModuleState.optimize(newState, encoderRotation)
+        SwerveModuleState.cosineScale(newState, encoderRotation)
 
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
         rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
 
+        rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
+
         #self.driveMotor.set(driveOutput)
-        self.driveMotor.set(-newState.speed)
-        self.rotationMotor.set(rotationOutput)
+        self.driveMotor.set(newState.speed)
+        self.rotationMotor.setVoltage(rotationOutput)
 
         """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
         SmartDashboard.putNumber("Rotation motor setpoint", rotationOutput)
@@ -114,7 +116,7 @@ class swerveModule(commands2.Subsystem):
         SmartDashboard.putNumber("Rotation motor actual setpoint", self.rotationEncoder.get_absolute_position().value_as_double)"""
 
 
-        print(f"Drive motor setpoint: {driveOutput} | Rotation motor setpoint: {rotationOutput}")
+        print(f"newSpeed: {newState.speed}")
 
 
     def stopAllMotors(self):
