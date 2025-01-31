@@ -14,7 +14,7 @@ import wpimath.geometry
 import wpimath.kinematics
 import Subsystems.drivetrain as drivetrain
 import pathplannerlib
-from wpimath.kinematics import SwerveModuleState
+from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
@@ -44,7 +44,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
 
         self.timer = wpilib.Timer()
-
         self.timer.start()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
@@ -66,12 +65,12 @@ class MyRobot(commands2.TimedCommandRobot):
 
 
     def robotPeriodic(self): 
-        """wpilib.SmartDashboard.putNumber("X Speed", self.xSpeed)
-        wpilib.SmartDashboard.putNumber("Y Speed", self.ySpeed)
-        wpilib.SmartDashboard.putNumber("Rotation", self.rot)"""
+        #wpilib.SmartDashboard.putNumber("X Speed", self.xSpeed)
+        #wpilib.SmartDashboard.putNumber("Y Speed", self.ySpeed)
+        #wpilib.SmartDashboard.putNumber("Rotation", self.rot)
         #SmartDashboard.putData("Field", self.field)
         #self.field.setRobotPose(self.odometry.getPose())
-        #self.swerve.updateOdometry()        
+        self.drivetrain.updateOdometry()        
         wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.getMotorTemperature())
         wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
         
@@ -128,14 +127,20 @@ class MyRobot(commands2.TimedCommandRobot):
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
         self.rot = self.applyDeadband(self.controller.getRightX())
-        
+
+        if (self.timer.hasElapsed(1)):
+            self.timer.reset()
+            print(self.xSpeed)        
 
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
             self.drivetrain.stopDrivetrain()
         else:
-            self.driveWithJoystick()
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, self.ySpeed, self.rot, self.drivetrain.gyro.getRotation2d())
+            self.drivetrain.drive(speeds)
+
+            #self.driveWithJoystick()
 
             
             
     def driveWithJoystick(self) -> None:
-        self.drivetrain.driveFO(self.xSpeed, self.ySpeed, self.rot)
+        self.drivetrain.driveFO(-self.xSpeed, self.ySpeed, self.rot)

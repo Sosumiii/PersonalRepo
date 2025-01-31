@@ -22,9 +22,14 @@ def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position 
 def rps2mps(rotations) -> float: #Converts from rotations per second to meters per Second
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
 
-def deg2Rot2d(deg) -> float:
-    yaw = deg/360
-    return Rotation2d(yaw * math.pi * 2)
+def encToRad(value): #converts the encoder value (a range from 0 to 1) to a value in radians.
+    deg = value * 360
+    rad = math.pi - wpimath.units.degreesToRadians(deg)
+    if (rad > math.pi):
+        rad -= 2 * math.pi
+    value += 0.01
+        
+    return rad
 
 class swerveModule(commands2.Subsystem):
     def __init__(
@@ -56,7 +61,7 @@ class swerveModule(commands2.Subsystem):
         
         self.configurator2.apply(rotationConfig)
 
-        self.rotationEncoder.setVoltagePercentageRange(0, 1)
+        #self.rotationEncoder.setVoltagePercentageRange(0, 1)
 
         #Motor setup
         #self.control = phoenix6.controls.voltage_out.VoltageOut(0.0)
@@ -93,7 +98,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModuleState(
             rps2mps(self.driveMotor.get_velocity().value_as_double), #Gets the speed of the wheels in m/s
-            Rotation2d((self.rotationEncoder.get() * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d(encToRad(self.rotationEncoder.get())) #Converts the position into radians as rotation2d requests
         )        
     
     def getPosition(self):
@@ -102,7 +107,7 @@ class swerveModule(commands2.Subsystem):
         """
         return SwerveModulePosition(
             talonFXtoDistance(self.driveMotor.get_position().value_as_double), #gets the current position of the wheels
-            Rotation2d((self.rotationEncoder.get() * (2*math.pi))) #Converts the position into radians as rotation2d requests
+            Rotation2d(encToRad(self.rotationEncoder.get())) #Converts the position into radians as rotation2d requests
         )
     
     def setState(
@@ -117,11 +122,11 @@ class swerveModule(commands2.Subsystem):
         driveOutput = self.drivePIDController.calculate(rps2mps(self.driveMotor.get_velocity().value), newState.speed)
         driveFF = self.driveMotorFeedForward.calculate(newState.speed)
 
-        rotationOutput = self.rotationPIDController.calculate(self.rotationEncoder.get() * (2*math.pi), newState.angle.radians())
+        rotationOutput = self.rotationPIDController.calculate(encToRad(self.rotationEncoder.get()), newState.angle.radians())
         rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
         #self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput + driveFF))
-        self.rotationMotor.setVoltage(rotationOutput + rotationFF)
+        #self.rotationMotor.setVoltage(rotationOutput + rotationFF)
 
         #self.driveMotor.set(driveOutput)
         self.driveMotor.set(newState.speed)
@@ -131,5 +136,5 @@ class swerveModule(commands2.Subsystem):
         
 
     def stopAllMotors(self):
-        self.driveMotor.set(0)
-        self.rotationMotor.set(0)
+        self.driveMotor.stopMotor()
+        self.rotationMotor.stopMotor

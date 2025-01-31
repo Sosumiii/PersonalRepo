@@ -9,6 +9,11 @@ import wpimath.units
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 
+import typing
+
+if typing.TYPE_CHECKING:
+    from robot import MyRobot
+
 
 kWheelRadius = 0.0508 #Wheel radius in Meters
 kDriveEncoderRes = 4096 #SparkMAX Enocder Resolution
@@ -95,31 +100,22 @@ class swerveModule(commands2.Subsystem):
         """
         Sets a new state for the swerve module to move to.
         """
-        encoderRotation = Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double))
-        
-        SwerveModuleState.optimize(newState, encoderRotation)
-        SwerveModuleState.cosineScale(newState, encoderRotation)
+        SwerveModuleState.optimize(newState, Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position()._value)))
 
         driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
-        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
+        driveFF = self.driveMotorFeedForward.calculate(newState.speed)
 
+        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position()._value), newState.angle.radians())
         rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
+
+
+        #self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput + driveFF))
+        #self.rotationMotor.setVoltage(rotationOutput + rotationFF)
 
         #self.driveMotor.set(driveOutput)
         self.driveMotor.set(newState.speed)
-        self.rotationMotor.setVoltage(rotationOutput)
-
-        """SmartDashboard.putNumber("Drive motor setpoint", driveOutput)
-        SmartDashboard.putNumber("Rotation motor setpoint", rotationOutput)
-        SmartDashboard.putNumber("Drive motor actual position", self.driveEncoder.getPosition)
-        SmartDashboard.putNumber("Rotation motor actual setpoint", self.rotationEncoder.get_absolute_position().value_as_double)"""
-        
-        print(rotationOutput)
-
-
-
-        
-
+        self.rotationMotor.set(rotationOutput)
+        #self.rotationMotor.set(rotationOutput)
 
     def stopAllMotors(self):
         self.driveMotor.stopMotor()

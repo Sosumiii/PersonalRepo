@@ -7,7 +7,6 @@ from wpimath.units import radiansToRotations
 from pyfrc.physics.core import PhysicsInterface
 from phoenix6 import unmanaged
 
-import rev
 import typing
 
 if typing.TYPE_CHECKING:
@@ -20,15 +19,24 @@ class PhysicsEngine:
         self.physics_controller = physics_controller
 
         # Create a DCMotorSim for physics sim
-        gearboxTalon = DCMotor.krakenX60FOC(4)
-        gearboxNEO = DCMotor.NEO(4)
-        self.motorTalon_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearboxTalon, 0.01, 6.75), gearboxTalon)
-        self.motorNEODrive_sim = sim.DCMotorSim(LinearSystemId.DCMotorSystem(gearboxNEO, 0.01, 6.75), gearboxNEO)
+        flDGearBox = DCMotor.krakenX60FOC(1)
+        frDGearBox = DCMotor.krakenX60FOC(1)
+        blDGearBox = DCMotor.krakenX60FOC(1)
+        brDGearBox = DCMotor.krakenX60FOC(1)
+
+
+        self.flDSIM = sim.DCMotorSim(LinearSystemId.DCMotorSystem(flDGearBox, 0.01, 6.75), flDGearBox)
+        self.frDSIM = sim.DCMotorSim(LinearSystemId.DCMotorSystem(frDGearBox, 0.01, 6.75), frDGearBox)
+        self.blDSIM = sim.DCMotorSim(LinearSystemId.DCMotorSystem(blDGearBox, 0.01, 6.75), blDGearBox)
+        self.brDSIM = sim.DCMotorSim(LinearSystemId.DCMotorSystem(brDGearBox, 0.01, 6.75), brDGearBox)
+
         # Keep a reference to the motor sim state so we can update it
-        self.NEO1sim = rev.SparkMaxSim(robot.drivetrain.flSM.driveMotor, gearboxNEO)
-        self.NEO2sim = rev.SparkMaxSim(robot.drivetrain.frSM.driveMotor, gearboxNEO)
-        self.NEO3sim = rev.SparkMaxSim(robot.drivetrain.blSM.driveMotor, gearboxNEO)
-        self.NEO4sim = rev.SparkMaxSim(robot.drivetrain.brSM.driveMotor, gearboxNEO)
+        self.flDSimState = robot.drivetrain.flSM.driveMotor.sim_state
+        self.frDSimState = robot.drivetrain.frSM.driveMotor.sim_state
+        self.blDSimState = robot.drivetrain.blSM.driveMotor.sim_state
+        self.brDSimState = robot.drivetrain.brSM.driveMotor.sim_state
+
+        self.gyroSim = robot.drivetrain.gyro.sim_state
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         """
@@ -43,12 +51,30 @@ class PhysicsEngine:
         if DriverStation.isEnabled():
             unmanaged.feed_enable(100)
 
-        self.NEOsim.setBusVoltage(RobotController.getBatteryVoltage())
-        self.motorNEODrive_sim.setInputVoltage(self.NEOsim.getBusVoltage())
 
-        """ self.talon_sim.set_supply_voltage(RobotController.getBatteryVoltage())
-        self.motor_sim.setInputVoltage(self.talon_sim.motor_voltage)
-        self.motor_sim.update(tm_diff)
-        self.talon_sim.set_raw_rotor_position(radiansToRotations(self.motor_sim.getAngularPosition()))
-        self.talon_sim.set_rotor_velocity(radiansToRotations(self.motor_sim.getAngularVelocity()))
- """
+        self.flDSimState.set_supply_voltage(RobotController.getBatteryVoltage())
+        self.frDSimState.set_supply_voltage(RobotController.getBatteryVoltage())
+        self.blDSimState.set_supply_voltage(RobotController.getBatteryVoltage())
+        self.brDSimState.set_supply_voltage(RobotController.getBatteryVoltage())
+
+        self.flDSIM.setInputVoltage(self.flDSimState.motor_voltage)
+        self.frDSIM.setInputVoltage(self.frDSimState.motor_voltage)
+        self.blDSIM.setInputVoltage(self.blDSimState.motor_voltage)
+        self.brDSIM.setInputVoltage(self.brDSimState.motor_voltage)
+
+        self.flDSIM.update(tm_diff)
+        self.frDSIM.update(tm_diff)
+        self.blDSIM.update(tm_diff)
+        self.brDSIM.update(tm_diff)
+
+        self.flDSimState.set_raw_rotor_position(radiansToRotations(self.flDSIM.getAngularPosition()))
+        self.flDSimState.set_rotor_velocity(radiansToRotations(self.flDSIM.getAngularVelocity()))
+
+        self.frDSimState.set_raw_rotor_position(radiansToRotations(self.frDSIM.getAngularPosition()))
+        self.frDSimState.set_rotor_velocity(radiansToRotations(self.frDSIM.getAngularVelocity()))
+
+        self.blDSimState.set_raw_rotor_position(radiansToRotations(self.blDSIM.getAngularPosition()))
+        self.blDSimState.set_rotor_velocity(radiansToRotations(self.blDSIM.getAngularVelocity()))
+
+        self.brDSimState.set_raw_rotor_position(radiansToRotations(self.brDSIM.getAngularPosition()))
+        self.brDSimState.set_rotor_velocity(radiansToRotations(self.brDSIM.getAngularVelocity()))
