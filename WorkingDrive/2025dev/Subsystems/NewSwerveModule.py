@@ -76,8 +76,10 @@ class swerveModule(commands2.Subsystem):
         self.rotationPIDController = wpimath.controller.PIDController(
             0.001,  # Proportional gain
             0.0,   # Integral gain
-            0.0,   # Derivative gain
+            0.1,   # Derivative gain
         )
+
+        self.driveMotor.get_velocity
 
         self.drivePIDController.enableContinuousInput(-math.pi, math.pi)
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)

@@ -48,12 +48,12 @@ class MyRobot(commands2.TimedCommandRobot):
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
 
-    """ def configureAuto(self):
+    def configureAuto(self):
         AutoBuilder.configure(
             self.drivetrain.odometry.getPose,
             self.drivetrain.reset,
-            self.drivetrain.getChassisSpeed,
-            self.drivetrain.driveRO,
+            self.drivetrain.getChassisSpeedsRO,
+            lambda speeds, feedforwards: self.drivetrain.driveRO(speeds),
             PPHolonomicDriveController(
                 PIDConstants(0.001, 0.0, 0.0),
                 PIDConstants(0.001, 0.0, 0.0),
@@ -61,7 +61,9 @@ class MyRobot(commands2.TimedCommandRobot):
             self.config,
             self.drivetrain.shouldFlipPath,
             self.drivetrain
-        ) """
+            )
+        
+        
 
 
     def robotPeriodic(self): 

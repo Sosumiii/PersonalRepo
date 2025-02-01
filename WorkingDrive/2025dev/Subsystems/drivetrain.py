@@ -38,10 +38,10 @@ class Drivetrain(commands2.Subsystem):
         #SwerveModule/hardware init
 
         #Old Swerve Configs
-        self.flSM = SM.swerveModule(1, 2, 9, 0)
-        self.frSM = SM.swerveModule(3, 4, 10, 0)
-        self.blSM = SM.swerveModule(5, 6, 11, 0)
-        self.brSM = SM.swerveModule(7, 8, 12, -.15)
+        self.flSM = SM.swerveModule(1, 2, 9, 0.51, 0.0, 0.00) #Tuned
+        self.frSM = SM.swerveModule(3, 4, 10, 0.51, 0.0, 0.001) #Tuned
+        self.blSM = SM.swerveModule(5, 6, 11, 0.5, 0.0, 0.0) 
+        self.brSM = SM.swerveModule(7, 8, 12, 0.51, 0.0, 0.002)
 
         self.flSM.rotationMotor.setInverted(True)
         self.frSM.rotationMotor.setInverted(True)
@@ -49,6 +49,9 @@ class Drivetrain(commands2.Subsystem):
         self.brSM.rotationMotor.setInverted(True)
 
         self.flSM.driveMotor.setInverted(True)
+        self.frSM.driveMotor.setInverted(True)
+        self.blSM.driveMotor.setInverted(True)
+        self.brSM.driveMotor.setInverted(True)
 
         
 
@@ -106,6 +109,12 @@ class Drivetrain(commands2.Subsystem):
 
     def getChassisSpeeds(self):
         return self.chassisSpeeds
+    
+    def getChassisSpeedsRO(self):
+        return self.chassisSpeeds.fromRobotRelativeSpeeds(self.chassisSpeeds, robotAngle=self.gyro.getRotation2d())
+    
+    def getChassisSpeedsFO(self):
+        return self.chassisSpeeds.fromFieldRelativeSpeeds(self.chassisSpeeds, robotAngle=self.gyro.getRotation2d())
 
 
     def shouldFlipPath(self):
