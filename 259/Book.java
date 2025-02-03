@@ -44,7 +44,7 @@ public class Book
 
   public Boolean Equals(Book b)
   {
-      System.out.println("Checking book " + t);
+      //System.out.println("Checking book " + t);
       return (title.equals(b.title) && author.equals(b.author));
   }
 
@@ -65,6 +65,8 @@ public class Book
 
   public int adjustRating(int newRating)
   {
+    System.out.println("Adjusting rating by " + r);
+    
     if (newRating > 10)
     {
       rating = 10;

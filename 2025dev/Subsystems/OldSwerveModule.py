@@ -38,7 +38,10 @@ class swerveModule(commands2.Subsystem):
         self,
         DriveMotorID: int,
         RotationMotorID: int,
-        RotationEncoderID: int
+        RotationEncoderID: int,
+        kP: float,
+        kI: float,
+        kD: float
         ) -> None:
         
         """
@@ -51,18 +54,19 @@ class swerveModule(commands2.Subsystem):
 
         self.driveEncoder = self.driveMotor.getEncoder()
         self.rotationEncoder = phoenix6.hardware.CANcoder(RotationEncoderID)
+
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0.0001,  # Proportional gain
+            0,  # Proportional gain
             0.00,   # Integral gain
             0.0,   # Derivative gain
         )
         
         self.rotationPIDController = wpimath.controller.PIDController(
-            0.5,  # Proportional gain
-            0.00,   # Integral gain
-            0.05,   # Derivative gain
+            kP,  # Proportional gain
+            kI,   # Integral gain
+            kD,   # Derivative gain
         )
 
         self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
@@ -100,12 +104,15 @@ class swerveModule(commands2.Subsystem):
         """
         Sets a new state for the swerve module to move to.
         """
-        SwerveModuleState.optimize(newState, Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position()._value)))
+        #SwerveModuleState.optimize(newState, Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)))
 
-        driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
-        driveFF = self.driveMotorFeedForward.calculate(newState.speed)
+        newState.optimize(Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)))
+        newState.cosineScale(Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)))
 
-        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position()._value), newState.angle.radians())
+        driveOutput = self.drivePIDController.calculate(self.driveMotor.get(), newState.speed)
+        #driveFF = self.driveMotorFeedForward.calculate(newState.speed)
+
+        rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
         rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
 
