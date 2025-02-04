@@ -124,19 +124,12 @@ class Drivetrain(commands2.Subsystem):
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
 
-    def driveFO(self, 
-        xSpeed: float, 
-        ySpeed: float, 
-        rotation: float,  
-        #periodSeconds: float
-    ) -> None:
+    def driveFO(self, speeds: ChassisSpeeds) -> None:
                 
-        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            xSpeed, ySpeed, rotation, self.gyro.getRotation2d()
-        )
+        speeds = ChassisSpeeds(speeds.vx, speeds.vy, speeds.omega)
 
         # Convert to swerve module states
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(self.chassisSpeeds)
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(speeds)
         
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
@@ -149,25 +142,21 @@ class Drivetrain(commands2.Subsystem):
         
 
         
-    def driveRO(self, 
-        xSpeed: float, 
-        ySpeed: float, 
-        rotation: float,  
-    ) -> None:
-        
+    def driveRO(self, speeds: ChassisSpeeds) -> None:        
         """
         Method to drive the robot in Robot Relative mode.
         :param xSpeed: Speed of the robot in the x direction (forward).
         :param ySpeed: Speed of the robot in the y direction (sideways).
         :param rot: Angular rate of the robot.
         """
-        self.chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(xSpeed, ySpeed, rotation, self.gyro.getRotation2d())
 
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(self.chassisSpeeds)
+        speeds = ChassisSpeeds(speeds.vx, speeds.vy, speeds.omega)
+
+        swerveModuleStates = self.kinematics.toSwerveModuleStates(speeds)
         
-        """ wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
+        wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
-        ) """
+        )
         
         self.flSM.setState(swerveModuleStates[0])
         self.frSM.setState(swerveModuleStates[1])

@@ -58,7 +58,7 @@ class swerveModule(commands2.Subsystem):
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0,  # Proportional gain
+            0.6,  # Proportional gain
             0.00,   # Integral gain
             0.0,   # Derivative gain
         )
@@ -97,6 +97,7 @@ class swerveModule(commands2.Subsystem):
             Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)) #Converts the position into radians as rotation2d requests
         )
     
+    
     def setState(
             self,
             newState: SwerveModuleState
@@ -109,18 +110,19 @@ class swerveModule(commands2.Subsystem):
         newState.optimize(Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)))
         newState.cosineScale(Rotation2d(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double)))
 
-        driveOutput = self.drivePIDController.calculate(self.driveMotor.get(), newState.speed)
+        driveOutput = self.drivePIDController.calculate(rpm2mps(self.driveEncoder.getVelocity()), newState.speed)
         #driveFF = self.driveMotorFeedForward.calculate(newState.speed)
 
         rotationOutput = self.rotationPIDController.calculate(ticks2rad(self.rotationEncoder.get_absolute_position().value_as_double), newState.angle.radians())
         rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
 
+
         #self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput + driveFF))
         #self.rotationMotor.setVoltage(rotationOutput + rotationFF)
 
         #self.driveMotor.set(driveOutput)
-        self.driveMotor.set(newState.speed)
+        self.driveMotor.set(driveOutput)
         self.rotationMotor.set(rotationOutput)
         #self.rotationMotor.set(rotationOutput)
 

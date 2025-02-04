@@ -15,7 +15,7 @@ import wpimath.kinematics
 import Subsystems.drivetrain as drivetrain
 import pathplannerlib
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
-from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.auto import AutoBuilder, PathPlannerAuto
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import SmartDashboard
@@ -23,6 +23,14 @@ from wpilib import SmartDashboard
 class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
+
+        self.test = "Test"
+        self.chooser = wpilib.SendableChooser()
+
+        self.chooser.setDefaultOption("Test", self.test)
+        SmartDashboard.putData("Auto choice", self.chooser)
+
+
         self.controller = wpilib.XboxController(0)
         self.drivetrain = drivetrain.Drivetrain()
         #self.config = RobotConfig.fromGUISettings() #Make a pathplanner project in this directory first before uncommenting this line.
@@ -32,11 +40,8 @@ class MyRobot(commands2.TimedCommandRobot):
         # get the default instance of NetworkTables
         nt = ntcore.NetworkTableInstance.getDefault()
         # Start publishing an array of module states with the "/SwerveStates" key
-        moduleStates = nt.getStructArrayTopic("/SwerveStates", SwerveModuleState)
-        Odometry = nt.getStructArrayTopic("/Odometry", wpimath.kinematics.SwerveDrive4Odometry)
-
-        self.odoPub = Odometry.publish()
-        self.statePub = moduleStates.publish()
+        topic = nt.getStructArrayTopic("/SwerveStates", SwerveModuleState)
+        self.pub = topic.publish()
 
         """ self.orchestra.add_instrument(self.motor)
 
@@ -49,14 +54,16 @@ class MyRobot(commands2.TimedCommandRobot):
         self.timer = wpilib.Timer()
         self.timer.start()
 
+        #self.configureAuto()
+
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
 
-    def configureAuto(self):
+    """ def configureAuto(self):
         AutoBuilder.configure(
             self.drivetrain.odometry.getPose,
             self.drivetrain.reset,
             self.drivetrain.getChassisSpeedsRO,
-            lambda speeds, feedforwards: self.drivetrain.driveRO(speeds),
+            lambda speeds, feedforwards: self.autoDrive(speeds),
             PPHolonomicDriveController(
                 PIDConstants(0.001, 0.0, 0.0),
                 PIDConstants(0.001, 0.0, 0.0),
@@ -64,9 +71,22 @@ class MyRobot(commands2.TimedCommandRobot):
             self.config,
             self.drivetrain.shouldFlipPath,
             self.drivetrain
-            )
+            ) """
         
+    """ def getAutoCommand(self):
+        self.autoSelected = self.chooser.getSelected()
+        auto = PathPlannerAuto(self.autoSelected)
+
+        return auto
+    
+    def autonomousInit(self):
+        self.command = self.getAutoCommand()
+        self.command
+        return super().autonomousInit()
         
+    def autonomousPeriodic(self):
+        self.drivetrain.updateOdometry()
+        return super().autonomousPeriodic() """
 
 
     def robotPeriodic(self): 
@@ -88,9 +108,6 @@ class MyRobot(commands2.TimedCommandRobot):
         wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.getMotorTemperature())
         wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
 
-        self.odoPub.set([self.drivetrain.odometry])
-        self.statePub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])
-
 
         
 
@@ -99,15 +116,45 @@ class MyRobot(commands2.TimedCommandRobot):
     """ def autonomousPeriodic(self) -> None:
         self.drivetrain.updateOdometry() """
 
-    def applyDeadband(self, value, deadband=0.5):
+    def applyDeadband(self, value, deadband=0.12):
         return value if abs(value) > deadband else 0
 
     def teleopPeriodic(self) -> None:
+        
+        """ if (self.controller.getAButton()):
+            self.motor.setVoltage(0.5)
+            print("A")
+        elif (self.controller.getBButton()):
+            self.motor.setVoltage(0.5)
+            print("B")
+        else:
+            self.motor.stopMotor()
+
+        if (self.controller.getRightBumperButton()):
+            self.orchestra.play()
+            print("Bumper")
+        elif (self.controller.getLeftBumperButton()):
+            self.orchestra.stop()
+
+        if (self.controller.getYButton()):
+            print(self.status.is_ok())
+            print(self.status.is_error())
+            print(self.status.is_warning())
+            
+        if (self.controller.getXButton()):
+            print(self.orchestra.is_playing()) """
+        
+        
+        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])
+
+        #print(str(self.drivetrain.gyro.getRotation2d()))
+        
+        
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
         self.rot = self.applyDeadband(self.controller.getRightX())
 
-        print(self.drivetrain.brSM.rotationEncoder.get_absolute_position().value_as_double)
+        #print(self.drivetrain.brSM.rotationEncoder.get_absolute_position().value_as_double)
 
         """ if (self.timer.hasElapsed(1)):
             self.timer.reset()
@@ -118,10 +165,14 @@ class MyRobot(commands2.TimedCommandRobot):
         else:
             """ speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
             self.drivetrain.drive(speeds) """
-
-            self.driveWithJoystick()
+            self.manualDrive()
 
             
             
-    def driveWithJoystick(self) -> None:
-        self.drivetrain.driveFO(-self.xSpeed, -self.ySpeed, -self.rot)
+    def manualDrive(self) -> None:
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
+        self.drivetrain.driveFO(speeds)
+
+    def autoDrive(self) -> None:
+        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
+        self.drivetrain.driveRO(speeds)
