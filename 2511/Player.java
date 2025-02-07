@@ -5,7 +5,6 @@
  */
 public class Player 
 {
-    private static int playerTurn = 0;
     private String playerName = "";
     private int playerScore = 0;
 
@@ -32,11 +31,6 @@ public class Player
     public int getScore()
     {
         return this.playerScore;
-    }
-
-    public int getTurn()
-    {
-        return playerTurn;
     }
 
     public void setName(String name)
