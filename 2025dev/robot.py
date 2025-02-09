@@ -24,11 +24,11 @@ class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
 
-        self.test = "Test"
+        """ self.test = "Test"
         self.chooser = wpilib.SendableChooser()
 
         self.chooser.setDefaultOption("Test", self.test)
-        SmartDashboard.putData("Auto choice", self.chooser)
+        SmartDashboard.putData("Auto choice", self.chooser) """
 
 
         self.controller = wpilib.XboxController(0)
@@ -96,16 +96,16 @@ class MyRobot(commands2.TimedCommandRobot):
         #SmartDashboard.putData("Field", self.field)
         #self.field.setRobotPose(self.odometry.getPose())
         self.drivetrain.updateOdometry()        
-        wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
         
-        wpilib.SmartDashboard.putNumber("FRD Temp", self.drivetrain.frSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("FRD Temp", self.drivetrain.frSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("FRR Temp", self.drivetrain.frSM.rotationMotor.getMotorTemperature())
 
-        wpilib.SmartDashboard.putNumber("BLD Temp", self.drivetrain.blSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("BLD Temp", self.drivetrain.blSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("BLR Temp", self.drivetrain.blSM.rotationMotor.getMotorTemperature())
 
-        wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.getMotorTemperature())
+        wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
 
 

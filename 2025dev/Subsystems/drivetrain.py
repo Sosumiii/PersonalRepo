@@ -12,25 +12,8 @@ from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState
 
 """Please Select which version of the Swerve Code that you want to use and the configs related to them"""
-#import Subsystems.NewSwerveModule as SM
-import Subsystems.OldSwerveModule as SM
-
-def ticks2rad(EncoderPositon):
-    return EncoderPositon * (2*math.pi)
-
-def gyro2Rot2d(gyro: phoenix6.hardware.Pigeon2):
-    yaw = gyro.get_yaw().value_as_double
-
-    h = yaw % 360
-
-    if h < 0:
-        h += 360
-    
-    h2 = h/360
-
-    heading = h2 * (math.pi * 2)
-
-    return Rotation2d(heading)
+import Subsystems.NewSwerveModule as SM
+#import Subsystems.OldSwerveModule as SM
     
 class Drivetrain(commands2.Subsystem):
     def __init__(self):
@@ -38,23 +21,15 @@ class Drivetrain(commands2.Subsystem):
         #SwerveModule/hardware init
 
         #Old Swerve Configs
-        self.flSM = SM.swerveModule(1, 2, 9, 0.51, 0.0, 0.00) #Tuned
-        self.frSM = SM.swerveModule(3, 4, 10, 0.51, 0.0, 0.001) #Tuned
-        self.blSM = SM.swerveModule(5, 6, 11, 0.5, 0.0, 0.0) 
-        self.brSM = SM.swerveModule(7, 8, 12, 0.51, 0.0, 0.002)
+        self.flSM = SM.swerveModule(1, 2, 1, 0.51, 0.0, 0.00) #Tuned
+        self.frSM = SM.swerveModule(3, 4, 2, 0.51, 0.0, 0.001) #Tuned
+        self.blSM = SM.swerveModule(5, 6, 3, 0.5, 0.0, 0.0) 
+        self.brSM = SM.swerveModule(7, 8, 4, 0.51, 0.0, 0.002)
 
         self.flSM.rotationMotor.setInverted(True)
         self.frSM.rotationMotor.setInverted(True)
         self.blSM.rotationMotor.setInverted(True)
         self.brSM.rotationMotor.setInverted(True)
-
-        self.flSM.driveMotor.setInverted(True)
-        self.frSM.driveMotor.setInverted(True)
-        self.blSM.driveMotor.setInverted(True)
-        self.brSM.driveMotor.setInverted(True)
-
-        
-
 
         #New Swerve Configs
         """ self.flSM = SM.swerveModule(1, 2, 0)
@@ -62,7 +37,7 @@ class Drivetrain(commands2.Subsystem):
         self.blSM = SM.swerveModule(5, 6, 2)
         self.brSM = SM.swerveModule(7, 8, 3) """
 
-        self.gyro = phoenix6.hardware.Pigeon2(13)
+        self.gyro = phoenix6.hardware.Pigeon2(9)
         self.gyro.set_yaw(0)
 
         self.chassisSpeeds = ChassisSpeeds(0, 0, 0)

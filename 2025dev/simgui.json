@@ -1,6 +1,11 @@
 {
   "HALProvider": {
     "Other Devices": {
+      "AnalogEncoder[1]": {
+        "header": {
+          "open": true
+        }
+      },
       "Pigeon 2 (v6)[8]": {
         "header": {
           "open": true
