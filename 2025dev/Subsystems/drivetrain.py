@@ -11,9 +11,7 @@ from wpilib import DriverStation
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState
 
-"""Please Select which version of the Swerve Code that you want to use and the configs related to them"""
-import Subsystems.NewSwerveModule as SM
-#import Subsystems.OldSwerveModule as SM
+import Subsystems.SwerveModule as SM
     
 class Drivetrain(commands2.Subsystem):
     def __init__(self):
@@ -21,21 +19,16 @@ class Drivetrain(commands2.Subsystem):
         #SwerveModule/hardware init
 
         #Old Swerve Configs
-        self.flSM = SM.swerveModule(1, 2, 1, 0.51, 0.0, 0.00) #Tuned
-        self.frSM = SM.swerveModule(3, 4, 2, 0.51, 0.0, 0.001) #Tuned
-        self.blSM = SM.swerveModule(5, 6, 3, 0.5, 0.0, 0.0) 
-        self.brSM = SM.swerveModule(7, 8, 4, 0.51, 0.0, 0.002)
+        self.flSM = SM.swerveModule(1, 2, 0, 0.51, 0.0, 0.00) #Tuned
+        self.frSM = SM.swerveModule(3, 4, 1, 0.51, 0.0, 0.001) #Tuned
+        self.blSM = SM.swerveModule(5, 6, 2, 0.5, 0.0, 0.0) 
+        self.brSM = SM.swerveModule(7, 8, 3, 0.51, 0.0, 0.002)
 
         self.flSM.rotationMotor.setInverted(True)
         self.frSM.rotationMotor.setInverted(True)
         self.blSM.rotationMotor.setInverted(True)
         self.brSM.rotationMotor.setInverted(True)
 
-        #New Swerve Configs
-        """ self.flSM = SM.swerveModule(1, 2, 0)
-        self.frSM = SM.swerveModule(3, 4, 1)
-        self.blSM = SM.swerveModule(5, 6, 2)
-        self.brSM = SM.swerveModule(7, 8, 3) """
 
         self.gyro = phoenix6.hardware.Pigeon2(9)
         self.gyro.set_yaw(0)
