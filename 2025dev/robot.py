@@ -14,11 +14,13 @@ import wpimath.geometry
 import wpimath.kinematics
 import Subsystems.drivetrain as drivetrain
 import pathplannerlib
+import elasticlib
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 from pathplannerlib.auto import AutoBuilder, PathPlannerAuto
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import SmartDashboard
+
 
 class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
@@ -34,8 +36,7 @@ class MyRobot(commands2.TimedCommandRobot):
         self.controller = wpilib.XboxController(0)
         self.drivetrain = drivetrain.Drivetrain()
         #self.config = RobotConfig.fromGUISettings() #Make a pathplanner project in this directory first before uncommenting this line.
-        #self.motor = phoenix6.hardware.TalonFX(0)
-        #self.orchestra = phoenix6.Orchestra()
+        self.orchestra = phoenix6.Orchestra()
         
         # get the default instance of NetworkTables
         nt = ntcore.NetworkTableInstance.getDefault()
@@ -43,12 +44,12 @@ class MyRobot(commands2.TimedCommandRobot):
         topic = nt.getStructArrayTopic("/SwerveStates", SwerveModuleState)
         self.pub = topic.publish()
 
-        """ self.orchestra.add_instrument(self.motor)
+        self.orchestra.add_instrument(self.drivetrain.blSM.driveMotor)
 
         self.status = self.orchestra.load_music("ievanpolkka.chrp")
 
         if not self.status.is_ok():
-            print("DONT PLAY IT PLZ") """
+            print("DONT PLAY IT PLZ")
 
 
         self.timer = wpilib.Timer()
@@ -90,11 +91,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
 
     def robotPeriodic(self): 
-        #wpilib.SmartDashboard.putNumber("X Speed", self.xSpeed)
-        #wpilib.SmartDashboard.putNumber("Y Speed", self.ySpeed)
-        #wpilib.SmartDashboard.putNumber("Rotation", self.rot)
-        #SmartDashboard.putData("Field", self.field)
-        #self.field.setRobotPose(self.odometry.getPose())
         self.drivetrain.updateOdometry()        
         wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
@@ -107,9 +103,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
         wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
-
-
-        
+       
 
         return super().robotPeriodic()
 
@@ -118,36 +112,15 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def applyDeadband(self, value, deadband=0.12):
         return value if abs(value) > deadband else 0
+    
+    def testInit(self):
+        self.orchestra.play()
+        return super().testInit()
 
-    def teleopPeriodic(self) -> None:
-        
-        """ if (self.controller.getAButton()):
-            self.motor.setVoltage(0.5)
-            print("A")
-        elif (self.controller.getBButton()):
-            self.motor.setVoltage(0.5)
-            print("B")
-        else:
-            self.motor.stopMotor()
-
-        if (self.controller.getRightBumperButton()):
-            self.orchestra.play()
-            print("Bumper")
-        elif (self.controller.getLeftBumperButton()):
-            self.orchestra.stop()
-
-        if (self.controller.getYButton()):
-            print(self.status.is_ok())
-            print(self.status.is_error())
-            print(self.status.is_warning())
-            
-        if (self.controller.getXButton()):
-            print(self.orchestra.is_playing()) """
-        
-        
+    def teleopPeriodic(self) -> None:        
         self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])
 
-        #print(str(self.drivetrain.gyro.getRotation2d()))
+        print(str(self.drivetrain.gyro.getRotation2d()))
         
         
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())

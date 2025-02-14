@@ -23,8 +23,9 @@ def rps2mps(rotations) -> float: #Converts from rotations per second to meters p
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
 
 def encToRad(value): #converts the encoder value (a range from 0 to 1) to a value in radians.
-    rot2d = value * math.pi
-    return rot2d
+    #radians = ((1 - value) - 0.5) * 2 * math.pi
+    radians = (value - 0.5) * (2*math.pi)
+    return radians
 
 class swerveModule(commands2.Subsystem):
     def __init__(
