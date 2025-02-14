@@ -16,9 +16,6 @@ import Subsystems.drivetrain as drivetrain
 import pathplannerlib
 import elasticlib
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
-from pathplannerlib.auto import AutoBuilder, PathPlannerAuto
-from pathplannerlib.controller import PPHolonomicDriveController
-from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import SmartDashboard
 
 
@@ -26,16 +23,9 @@ class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
 
-        """ self.test = "Test"
-        self.chooser = wpilib.SendableChooser()
-
-        self.chooser.setDefaultOption("Test", self.test)
-        SmartDashboard.putData("Auto choice", self.chooser) """
-
-
         self.controller = wpilib.XboxController(0)
         self.drivetrain = drivetrain.Drivetrain()
-        #self.config = RobotConfig.fromGUISettings() #Make a pathplanner project in this directory first before uncommenting this line.
+
         self.orchestra = phoenix6.Orchestra()
         
         # get the default instance of NetworkTables
@@ -55,40 +45,6 @@ class MyRobot(commands2.TimedCommandRobot):
         self.timer = wpilib.Timer()
         self.timer.start()
 
-        #self.configureAuto()
-
-        # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-
-    """ def configureAuto(self):
-        AutoBuilder.configure(
-            self.drivetrain.odometry.getPose,
-            self.drivetrain.reset,
-            self.drivetrain.getChassisSpeedsRO,
-            lambda speeds, feedforwards: self.autoDrive(speeds),
-            PPHolonomicDriveController(
-                PIDConstants(0.001, 0.0, 0.0),
-                PIDConstants(0.001, 0.0, 0.0),
-            ),
-            self.config,
-            self.drivetrain.shouldFlipPath,
-            self.drivetrain
-            ) """
-        
-    """ def getAutoCommand(self):
-        self.autoSelected = self.chooser.getSelected()
-        auto = PathPlannerAuto(self.autoSelected)
-
-        return auto
-    
-    def autonomousInit(self):
-        self.command = self.getAutoCommand()
-        self.command
-        return super().autonomousInit()
-        
-    def autonomousPeriodic(self):
-        self.drivetrain.updateOdometry()
-        return super().autonomousPeriodic() """
-
 
     def robotPeriodic(self): 
         self.drivetrain.updateOdometry()        
@@ -106,9 +62,10 @@ class MyRobot(commands2.TimedCommandRobot):
        
 
         return super().robotPeriodic()
-
-    """ def autonomousPeriodic(self) -> None:
-        self.drivetrain.updateOdometry() """
+        
+    def autonomousPeriodic(self):
+        self.drivetrain.updateOdometry()
+        return super().autonomousPeriodic()
 
     def applyDeadband(self, value, deadband=0.12):
         return value if abs(value) > deadband else 0
@@ -122,22 +79,13 @@ class MyRobot(commands2.TimedCommandRobot):
 
         print(str(self.drivetrain.gyro.getRotation2d()))
         
-        
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
-        self.rot = self.applyDeadband(self.controller.getRightX())
-
-        #print(self.drivetrain.brSM.rotationEncoder.get_absolute_position().value_as_double)
-
-        """ if (self.timer.hasElapsed(1)):
-            self.timer.reset()
-            print(self.xSpeed)      """   
+        self.rot = self.applyDeadband(self.controller.getRightX())  
 
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
             self.drivetrain.stopDrivetrain()
         else:
-            """ speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
-            self.drivetrain.drive(speeds) """
             self.manualDrive()
 
     def encoderCheck(self):
