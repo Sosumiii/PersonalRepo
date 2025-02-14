@@ -1,86 +1,72 @@
-import rev
-import wpilib
+import phoenix6
+from phoenix6 import SignalLogger, hardware, controls, configs
 import wpilib.drive
 from wpilib.sysid import SysIdRoutineLog
 import commands2
 from commands2.sysid import SysIdRoutine
-import wpimath.units
 import math
-from wpilib import drive, RobotController
+from commands2 import Command
+from commands2.sysid import SysIdRoutine
+
+
 
 from typing import Callable
 
 kWheelRadius = 0.0508 #Wheel radius in Meters
-kDriveEncoderRes = 4096 #SparkMAX Enocder Resolution
+kDriveEncoderRes = 2048 #SparkMAX Enocder Resolution
 kMaxAngularVelocity = math.pi
 kMaxAngularAcceleration = math.tau
 kGearRatio = 6.75
 
-def NEOtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
+def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
     return (EncoderPosition * math.pi * (2*kWheelRadius) / (kDriveEncoderRes * kGearRatio))
 
-def rpm2mps(rotations) -> float: #Converts from rotations per minute to meters per Second
-    rps = rotations / 60.0
-    rpsWithRatio = rps / kGearRatio
-    speed = rpsWithRatio * (2 * math.pi * kWheelRadius)
-    return speed
+def rps2mps(rotations) -> float: #Converts from rotations per second to meters per Second
+    return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
 
-class Drive(commands2.Subsystem):
+class DriveControl(commands2.Subsystem):
     def __init__(self) -> None:
-        self.flDrive = rev.SparkMax(1, rev.SparkMax.MotorType.kBrushless)
-        self.blDrive = rev.SparkMax(5, rev.SparkMax.MotorType.kBrushless)
-        
-        self.frDrive = rev.SparkMax(3, rev.SparkMax.MotorType.kBrushless)
-        self.brDrive = rev.SparkMax(7, rev.SparkMax.MotorType.kBrushless)
-        
-        self.flEnc = self.flDrive.getEncoder()
-        self.blEnc = self.blDrive.getEncoder()
-        
-        self.frEnc = self.frDrive.getEncoder()
-        self.brEnc = self.brDrive.getEncoder()
-        
-        self.leftMotorGroup = wpilib.MotorControllerGroup(self.flDrive, self.blDrive)
-        self.rightMotorGroup = wpilib.MotorControllerGroup(self.frDrive, self.brDrive)
-        
-        self.drive = wpilib.drive.DifferentialDrive(self.leftMotorGroup, self.rightMotorGroup)
+        self.motors = [
+            hardware.TalonFX(1),
+            hardware.TalonFX(3),
+            hardware.TalonFX(5),
+            hardware.TalonFX(7),
+        ]
 
-        super().__init__()
-        
-        def drive(voltage: wpimath.units.volts):
-            self.leftMotorGroup.setVoltage(-voltage)
-            self.rightMotorGroup.setVoltage(-voltage)  
-            
+        motorConfig = configs.TalonFXConfiguration()
+
+        #inverted = motorConfig.motor_output.with_inverted(1)
+        currents = motorConfig.current_limits.with_stator_current_limit_enable(True)
+        currents.with_stator_current_limit(40)
+
+        #motorConfig.with_motor_output(inverted)
+        motorConfig.with_current_limits(currents)
+        motorConfig.serialize()
+
+        for motor in self.motors:
+            motor.configurator.apply(motorConfig)
+
+        self.voltage_req = controls.VoltageOut(0)
+
         self.sys_id_routine = SysIdRoutine(
-            SysIdRoutine.Config(),
-            SysIdRoutine.Mechanism(drive, self.log, self),
+            SysIdRoutine.Config(
+                # Use default ramp rate (1 V/s) and timeout (10 s)
+                # Reduce dynamic voltage to 4 to prevent brownout
+                stepVoltage=4.0,
+                # Log state with Phoenix SignalLogger class
+                recordState=lambda state: SignalLogger.write_string(
+                    "state", SysIdRoutineLog.stateEnumToString(state)
+                ),
+            ),
+            SysIdRoutine.Mechanism(
+                lambda volts: [motor.set_control(self.voltage_req.with_output(volts)) for motor in self.motors],
+                lambda log: None,
+                self,
+            ),
         )
     
-    def log(self, sys_id_routine: SysIdRoutineLog):
-        sys_id_routine.motor("frontLeft-Drive").voltage(
-            self.flDrive.get() * RobotController.getBatteryVoltage()
-        ).position(NEOtoDistance(self.flEnc.getPosition())).velocity(rpm2mps(self.flEnc.getVelocity()))
-        
-        sys_id_routine.motor("backLeft-Drive").voltage(
-            self.blDrive.get() * RobotController.getBatteryVoltage()
-        ).position(NEOtoDistance(self.blEnc.getPosition())).velocity(rpm2mps(self.blEnc.getVelocity()))
-        
-        sys_id_routine.motor("frontRight-Drive").voltage(
-            self.frDrive.get() * RobotController.getBatteryVoltage()
-        ).position(NEOtoDistance(self.frEnc.getPosition())).velocity(rpm2mps(self.frEnc.getVelocity()))
-        
-        sys_id_routine.motor("backRight-Drive").voltage(
-            self.brDrive.get() * RobotController.getBatteryVoltage()
-        ).position(NEOtoDistance(self.brEnc.getPosition())).velocity(rpm2mps(self.brEnc.getVelocity()))
-        
-        
-    def arcadeDriveCommand(
-        self, fwd: Callable[[], float], rot: Callable[[], float]
-    ) -> commands2.Command:
-        
-        return self.run(lambda: self.drive.arcadeDrive(fwd(), rot()))
-    
-    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction) -> commands2.Command:
+    def sys_id_quasistatic(self, direction: SysIdRoutine.Direction) -> Command:
         return self.sys_id_routine.quasistatic(direction)
-    
-    def sysIdDynamic(self, direction: SysIdRoutine.Direction) -> commands2.Command:
+
+    def sys_id_dynamic(self, direction: SysIdRoutine.Direction) -> Command:
         return self.sys_id_routine.dynamic(direction)
