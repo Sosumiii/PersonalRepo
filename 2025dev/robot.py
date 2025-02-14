@@ -140,7 +140,11 @@ class MyRobot(commands2.TimedCommandRobot):
             self.drivetrain.drive(speeds) """
             self.manualDrive()
 
-            
+    def encoderCheck(self):
+        SmartDashboard.getNumber(self.drivetrain.flSM.rotationEncoder.get())
+        SmartDashboard.getNumber(self.drivetrain.frSM.rotationEncoder.get())
+        SmartDashboard.getNumber(self.drivetrain.blSM.rotationEncoder.get())
+        SmartDashboard.getNumber(self.drivetrain.brSM.rotationEncoder.get())
             
     def manualDrive(self) -> None:
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
