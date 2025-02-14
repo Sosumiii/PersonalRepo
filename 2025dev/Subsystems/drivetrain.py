@@ -17,8 +17,6 @@ class Drivetrain(commands2.Subsystem):
     def __init__(self):
 
         #SwerveModule/hardware init
-
-        #Old Swerve Configs
         self.flSM = SM.swerveModule(1, 2, 0, 0.51, 0.0, 0.00) #Tuned
         self.frSM = SM.swerveModule(3, 4, 1, 0.51, 0.0, 0.001) #Tuned
         self.blSM = SM.swerveModule(5, 6, 2, 0.5, 0.0, 0.0) 
@@ -74,9 +72,6 @@ class Drivetrain(commands2.Subsystem):
             ),
             Pose2d()
         )
-
-    def getChassisSpeeds(self):
-        return self.chassisSpeeds
     
     def getChassisSpeedsRO(self):
         return self.chassisSpeeds.fromRobotRelativeSpeeds(self.chassisSpeeds, robotAngle=self.gyro.getRotation2d())
