@@ -10,17 +10,14 @@ import wpimath.units
 from wpilib import DriverStation
 from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState
-from pathplannerlib.auto import AutoBuilder, PathPlannerAuto, PathPlannerPath, FollowPathCommand
-from pathplannerlib.controller import PPHolonomicDriveController
-from pathplannerlib.config import RobotConfig, PIDConstants
 
 import Subsystems.SwerveModule as SM
-    
+
 class Drivetrain(commands2.Subsystem):
     def __init__(self):
         #SwerveModule/hardware init
-        self.flSM = SM.swerveModule(1, 2, 0, 0.592, 0.25, 0.0, 0.00) #Tuned
-        self.frSM = SM.swerveModule(3, 4, 1, 0.867, 0.25, 0.0, 0.00) #Tuned
+        self.flSM = SM.swerveModule(1, 2, 0, 0.592, 0.25, 0.0, 0.00)
+        self.frSM = SM.swerveModule(3, 4, 1, 0.867, 0.25, 0.0, 0.00)
         self.blSM = SM.swerveModule(5, 6, 2, 0.520, 0.25, 0.0, 0.0) 
         self.brSM = SM.swerveModule(7, 8, 3, 0.767, 0.25, 0.0, 0.00)
 
@@ -50,20 +47,6 @@ class Drivetrain(commands2.Subsystem):
             Pose2d()
         )
 
-        AutoBuilder.configure(
-            self.odometry.getPose,
-            self.odometry.resetPose,
-            self.getChassisSpeeds,
-            lambda speeds, feedforwards: self.driveRO(speeds),
-            PPHolonomicDriveController(
-                PIDConstants(0.1, 0.0, 0.0),
-                PIDConstants(0.1, 0.0, 0.0)
-            ),
-            RobotConfig.fromGUISettings(),
-            self.shouldFlipPath,
-            self
-        )
-
     def reset(self):
         """
         Reset the tracking system.
@@ -85,19 +68,17 @@ class Drivetrain(commands2.Subsystem):
     def getPose(self):
         return self.odometry.getPose()
     
-    def resetPose(self):
-        self.odometry.resetPose()
+    def resetPose(self, pose2d: wpimath.geometry.Pose2d):
+        self.odometry.resetPose(pose2d)
     
     def getChassisSpeeds(self):
         return self.chassisSpeeds
-
-
+    
     def shouldFlipPath(self):
         # Boolean supplier that controls when the path will be mirrored for the red alliance
         # This will flip the path being followed to the red side of the field.
         # THE ORIGIN WILL REMAIN ON THE BLUE SIDE
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
-
 
     def driveFO(self, speeds: ChassisSpeeds) -> None:
                 
@@ -154,3 +135,4 @@ class Drivetrain(commands2.Subsystem):
         self.frSM.stopAllMotors()
         self.blSM.stopAllMotors()
         self.brSM.stopAllMotors()
+

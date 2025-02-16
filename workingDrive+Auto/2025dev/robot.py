@@ -15,11 +15,28 @@ import wpimath.kinematics
 from Subsystems.drivetrain import Drivetrain
 import pathplannerlib
 import elasticlib
+from wpilib import DriverStation
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 from pathplannerlib.auto import AutoBuilder, PathPlannerAuto
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import SmartDashboard
+
+drivetrain = Drivetrain()
+
+AutoBuilder.configure(
+    drivetrain.getPose,
+    drivetrain.resetPose,
+    drivetrain.getChassisSpeeds,
+    lambda speeds, feedforwards: drivetrain.driveRO(speeds),
+    PPHolonomicDriveController(
+        PIDConstants(0.001, 0.0, 0.0),
+        PIDConstants(0.001, 0.0, 0.0),
+    ),
+    RobotConfig.fromGUISettings(),
+    drivetrain.shouldFlipPath,
+    drivetrain
+    ) 
 
 
 class MyRobot(commands2.TimedCommandRobot):
@@ -29,7 +46,7 @@ class MyRobot(commands2.TimedCommandRobot):
         self.test = "Test"
 
         self.controller = wpilib.XboxController(0)
-        self.drivetrain = Drivetrain()
+        self.drivetrain = drivetrain
         #self.config = RobotConfig.fromGUISettings() #Make a pathplanner project in this directory first before uncommenting this line.
 
         self.orchestra = phoenix6.Orchestra()
@@ -98,7 +115,7 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().testInit()
 
     def teleopPeriodic(self) -> None:        
-        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])    
+        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.brSM.getState()])    
         
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
