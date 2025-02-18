@@ -1,0 +1,56 @@
+import rev
+import math
+import wpilib
+import wpimath.controller
+from commands2 import Subsystem
+import wpimath.trajectory
+from wpimath.trajectory import TrapezoidProfile
+
+
+class Elevator(Subsystem):
+    def __init__(self):
+        #Motor init
+
+        self.elevatorMoveMotor1 = rev.SparkMax(10, rev.SparkMax.MotorType.kBrushless)
+        self.elevatorMoveMotor2 = rev.SparkMax(11, rev.SparkMax.MotorType.kBrushless)
+        self.outtakeMotor = rev.SparkMax(12, rev.SparkMax.MotorType.kBrushless)
+
+        self.elevatorEncoder = self.elevatorMoveMotor1.getEncoder()
+
+        #Config Elevator motor ID 10
+        leaderConfig = rev.SparkMaxConfig()
+        brake = leaderConfig.setIdleMode(idleMode=leaderConfig.IdleMode.kBrake)
+        limit = leaderConfig.smartCurrentLimit(30)
+
+        leaderConfig.apply(brake)
+        leaderConfig.apply(limit)
+        
+        self.elevatorMoveMotor1.configure(leaderConfig, self.elevatorMoveMotor1.ResetMode.kNoResetSafeParameters, self.elevatorMoveMotor1.PersistMode.kPersistParameters)     
+
+        #Config Elevator motor ID 11
+        followerConfig = rev.SparkMaxConfig()
+        follow = followerConfig.follow(10)
+        brake = followerConfig.setIdleMode(idleMode=followerConfig.IdleMode.kBrake)
+        limit = followerConfig.smartCurrentLimit(30)
+
+        followerConfig.apply(follow)
+        followerConfig.apply(brake)
+        followerConfig.apply(limit)
+
+        self.elevatorMoveMotor2.configure(followerConfig, self.elevatorMoveMotor2.ResetMode.kNoResetSafeParameters, self.elevatorMoveMotor2.PersistMode.kPersistParameters)
+
+        #
+        self.constraints = TrapezoidProfile(1.0, 0.5)
+        self.PIDcontroller = wpimath.controller.ProfiledPIDController(0.4, 0.0, 0.0, self.constraints)
+
+        self.feedForward = wpimath.controller.ElevatorFeedforward(0.1, 0.02, 0.6) #Retune pls
+
+        self.goal = TrapezoidProfile.State()
+        self.setPoint = TrapezoidProfile.State()
+
+        super().__init__()
+
+
+    def setL1(self):
+        self.goal = TrapezoidProfile.State(5, 0)
+        
