@@ -12,31 +12,57 @@ import wpimath.filter
 import wpimath.controller
 import wpimath.geometry
 import wpimath.kinematics
-import Subsystems.drivetrain as drivetrain
+from Subsystems.drivetrain import Drivetrain
 import pathplannerlib
 import elasticlib
+from wpilib import DriverStation
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
+from pathplannerlib.auto import AutoBuilder, PathPlannerAuto
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import SmartDashboard
+from Subsystems.elevator import Elevator
+
+drivetrain = Drivetrain()
+
+AutoBuilder.configure(
+    drivetrain.getPose,
+    drivetrain.resetPose,
+    drivetrain.getChassisSpeeds,
+    lambda speeds, feedforwards: drivetrain.driveRO(speeds),
+    PPHolonomicDriveController(
+        PIDConstants(0.001, 0.0, 0.0),
+        PIDConstants(0.001, 0.0, 0.0),
+    ),
+    RobotConfig.fromGUISettings(),
+    drivetrain.shouldFlipPath,
+    drivetrain
+    ) 
 
 
 class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
+        #print("Robot Initialized!")
+        self.test = "Test"
 
         self.controller = wpilib.XboxController(0)
-        self.drivetrain = drivetrain.Drivetrain()
+        self.elevator = Elevator()
+        self.drivetrain = drivetrain
 
         self.orchestra = phoenix6.Orchestra()
         
         # get the default instance of NetworkTables
         nt = ntcore.NetworkTableInstance.getDefault()
+
         # Start publishing an array of module states with the "/SwerveStates" key
         topic = nt.getStructArrayTopic("/SwerveStates", SwerveModuleState)
         self.pub = topic.publish()
+        self.autoCommand = None
 
         self.orchestra.add_instrument(self.drivetrain.blSM.driveMotor)
 
-        self.status = self.orchestra.load_music("ievanpolkka.chrp")
+        self.status = self.orchestra.load_music("TestTrackChirp.chrp")
 
         if not self.status.is_ok():
             print("DONT PLAY IT PLZ")
@@ -44,6 +70,22 @@ class MyRobot(commands2.TimedCommandRobot):
 
         self.timer = wpilib.Timer()
         self.timer.start()
+ 
+    def getAutoCommand(self):
+        self.autoSelected = self.test
+        auto = PathPlannerAuto(self.autoSelected)
+
+        return auto
+    
+    def autonomousInit(self):
+        self.autoCommand = PathPlannerAuto("Test")
+
+        self.autoCommand.schedule()
+        return super().autonomousInit()
+        
+    def autonomousPeriodic(self):
+        self.drivetrain.updateOdometry()
+        return super().autonomousPeriodic()
 
 
     def robotPeriodic(self): 
@@ -62,10 +104,6 @@ class MyRobot(commands2.TimedCommandRobot):
        
 
         return super().robotPeriodic()
-        
-    def autonomousPeriodic(self):
-        self.drivetrain.updateOdometry()
-        return super().autonomousPeriodic()
 
     def applyDeadband(self, value, deadband=0.12):
         return value if abs(value) > deadband else 0
@@ -75,24 +113,18 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().testInit()
 
     def teleopPeriodic(self) -> None:        
-        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.frSM.getState()])
-
-        print(str(self.drivetrain.gyro.getRotation2d()))
+        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.brSM.getState()])    
         
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
-        self.rot = self.applyDeadband(self.controller.getRightX())  
+        self.rot = self.applyDeadband(self.controller.getRightX())
+
 
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
             self.drivetrain.stopDrivetrain()
         else:
             self.manualDrive()
 
-    def encoderCheck(self):
-        SmartDashboard.getNumber(self.drivetrain.flSM.rotationEncoder.get())
-        SmartDashboard.getNumber(self.drivetrain.frSM.rotationEncoder.get())
-        SmartDashboard.getNumber(self.drivetrain.blSM.rotationEncoder.get())
-        SmartDashboard.getNumber(self.drivetrain.brSM.rotationEncoder.get())
             
     def manualDrive(self) -> None:
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())

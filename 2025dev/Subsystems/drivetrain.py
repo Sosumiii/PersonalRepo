@@ -12,21 +12,14 @@ from wpimath.geometry import Pose2d, Rotation2d, Translation2d
 from wpimath.kinematics import SwerveDrive4Odometry, SwerveDrive4Kinematics, ChassisSpeeds, SwerveModuleState
 
 import Subsystems.SwerveModule as SM
-    
+
 class Drivetrain(commands2.Subsystem):
     def __init__(self):
-
         #SwerveModule/hardware init
-        self.flSM = SM.swerveModule(1, 2, 0, 0.51, 0.0, 0.00) #Tuned
-        self.frSM = SM.swerveModule(3, 4, 1, 0.51, 0.0, 0.001) #Tuned
-        self.blSM = SM.swerveModule(5, 6, 2, 0.5, 0.0, 0.0) 
-        self.brSM = SM.swerveModule(7, 8, 3, 0.51, 0.0, 0.002)
-
-        self.flSM.rotationMotor.setInverted(True)
-        self.frSM.rotationMotor.setInverted(True)
-        self.blSM.rotationMotor.setInverted(True)
-        self.brSM.rotationMotor.setInverted(True)
-
+        self.flSM = SM.swerveModule(1, 2, 0, 0.592, 0.25, 0.0, 0.00)
+        self.frSM = SM.swerveModule(3, 4, 1, 0.867, 0.25, 0.0, 0.00)
+        self.blSM = SM.swerveModule(5, 6, 2, 0.520, 0.25, 0.0, 0.0) 
+        self.brSM = SM.swerveModule(7, 8, 3, 0.767, 0.25, 0.0, 0.00)
 
         self.gyro = phoenix6.hardware.Pigeon2(9)
         self.gyro.set_yaw(0)
@@ -54,38 +47,38 @@ class Drivetrain(commands2.Subsystem):
             Pose2d()
         )
 
-        super().__init__()
-
     def reset(self):
         """
         Reset the tracking system.
         """
         self.gyro.set_yaw(0)
 
-        self.odometry.resetPosition(
-            self.gyro.getRotation2d(),
+        self.odometry = SwerveDrive4Odometry(
+            self.kinematics,
+            Rotation2d(),
             (
                 self.flSM.getPosition(),
                 self.frSM.getPosition(),
                 self.blSM.getPosition(),
-                self.brSM.getPosition(),
+                self.brSM.getPosition()
             ),
             Pose2d()
         )
     
-    def getChassisSpeedsRO(self):
-        return self.chassisSpeeds.fromRobotRelativeSpeeds(self.chassisSpeeds, robotAngle=self.gyro.getRotation2d())
+    def getPose(self):
+        return self.odometry.getPose()
     
-    def getChassisSpeedsFO(self):
-        return self.chassisSpeeds.fromFieldRelativeSpeeds(self.chassisSpeeds, robotAngle=self.gyro.getRotation2d())
-
-
+    def resetPose(self, pose2d: wpimath.geometry.Pose2d):
+        self.odometry.resetPose(pose2d)
+    
+    def getChassisSpeeds(self):
+        return self.chassisSpeeds
+    
     def shouldFlipPath(self):
         # Boolean supplier that controls when the path will be mirrored for the red alliance
         # This will flip the path being followed to the red side of the field.
         # THE ORIGIN WILL REMAIN ON THE BLUE SIDE
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
-
 
     def driveFO(self, speeds: ChassisSpeeds) -> None:
                 
@@ -142,3 +135,4 @@ class Drivetrain(commands2.Subsystem):
         self.frSM.stopAllMotors()
         self.blSM.stopAllMotors()
         self.brSM.stopAllMotors()
+

@@ -23,8 +23,7 @@ def rps2mps(rotations) -> float: #Converts from rotations per second to meters p
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
 
 def encToRad(value): #converts the encoder value (a range from 0 to 1) to a value in radians.
-    #radians = ((1 - value) - 0.5) * 2 * math.pi
-    radians = (value - 0.5) * (2*math.pi)
+    radians = (value - 0.5) * 2 *math.pi
     return radians
 
 class swerveModule(commands2.Subsystem):
@@ -33,6 +32,7 @@ class swerveModule(commands2.Subsystem):
         DriveMotorID: int,
         RotationMotorID: int,
         RotationEncoderPort: int,
+        EncoderOffset: float,
         RotationkP: float,
         RotationkI: float,
         RotationkD: float
@@ -45,21 +45,27 @@ class swerveModule(commands2.Subsystem):
         #Hardware init
         self.driveMotor = phoenix6.hardware.TalonFX(DriveMotorID)
         self.rotationMotor = rev.SparkMax(RotationMotorID, rev.SparkMax.MotorType.kBrushless)
-        self.rotationEncoder = wpilib.AnalogEncoder(RotationEncoderPort)
+        self.rotationEncoder = wpilib.AnalogEncoder(RotationEncoderPort, 1, EncoderOffset)
 
         #Just to make sure that the correct settings are actually applied to the motors.
         motorConfig = phoenix6.configs.TalonFXConfiguration()
 
         #inverted = motorConfig.motor_output.with_inverted(1)
+        brake = motorConfig.motor_output.with_neutral_mode(phoenix6.signals.NeutralModeValue.BRAKE)
         currents = motorConfig.current_limits.with_stator_current_limit_enable(True)
         currents.with_stator_current_limit(40)
 
-        #motorConfig.with_motor_output(inverted)
         motorConfig.with_current_limits(currents)
+        motorConfig.with_motor_output(brake)
         motorConfig.serialize()
 
-        self.driveMotor.configurator.apply(motorConfig)
+        rotationConfig = rev.SparkMaxConfig()
+        limits = rotationConfig.smartCurrentLimit(40)
+        brake = rotationConfig.setIdleMode(rotationConfig.IdleMode.kBrake)
 
+        rotationConfig.apply(brake)
+        rotationConfig.apply(limits)
+        self.rotationMotor.configure(rotationConfig, self.rotationMotor.ResetMode.kResetSafeParameters, self.rotationMotor.PersistMode.kPersistParameters)
 
         #self.rotationEncoder.setVoltagePercentageRange(0, 1)
 
@@ -68,7 +74,7 @@ class swerveModule(commands2.Subsystem):
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            1.0,  # Proportional gain
+            0.33,  # Proportional gain
             0.0,   # Integral gain
             0.0,   # Derivative gain
         )
@@ -83,7 +89,7 @@ class swerveModule(commands2.Subsystem):
         self.rotationPIDController.setSetpoint(0.0)
         
         #Feed Forward Control
-        self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 3)
+        self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 2)
         self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 0.5)
 
 
@@ -117,21 +123,13 @@ class swerveModule(commands2.Subsystem):
         newState.optimize(Rotation2d(encToRad(self.rotationEncoder.get())))
         newState.cosineScale(Rotation2d(encToRad(self.rotationEncoder.get())))
 
-        driveOutput = self.drivePIDController.calculate(rps2mps(self.driveMotor.get_velocity().value), newState.speed)
+        driveOutput = self.drivePIDController.calculate(self.driveMotor.get(), newState.speed)
         driveFF = self.driveMotorFeedForward.calculate(newState.speed)
 
         rotationOutput = self.rotationPIDController.calculate(encToRad(self.rotationEncoder.get()), newState.angle.radians())
-        rotationFF = self.rotationMotorFeedForward.calculate(self.rotationPIDController.getSetpoint())
 
-        #self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput + driveFF))
-        #self.rotationMotor.setVoltage(rotationOutput + rotationFF)
-
-        #self.driveMotor.set(driveOutput)
-        self.driveMotor.set(newState.speed)
-        self.rotationMotor.setVoltage(rotationOutput)
-        #self.rotationMotor.set(rotationOutput)
-
-        
+        self.driveMotor.set(driveOutput)
+        self.rotationMotor.set(rotationOutput)
 
     def stopAllMotors(self):
         self.driveMotor.stopMotor()
