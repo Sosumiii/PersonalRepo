@@ -9,5 +9,8 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().robotInit()
     
     def testPeriodic(self):
-        self.elevator.motorMove()
+        self.elevator.setL1()
         return super().testPeriodic()
+    def teleopPeriodic(self) -> None:
+        self.elevator.setL2()
+        return super().teleopPeriodic()

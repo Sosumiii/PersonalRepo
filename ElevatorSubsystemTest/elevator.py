@@ -1,10 +1,14 @@
 import rev
 import math
 import wpilib
+import wpimath.units
 import wpimath.controller
 from commands2 import Subsystem
 import wpimath.trajectory
 from wpimath.trajectory import TrapezoidProfile
+
+def rpm2rps(rpm):
+    return rpm / 60
 
 
 class Elevator(Subsystem):
@@ -21,11 +25,11 @@ class Elevator(Subsystem):
         leaderConfig = rev.SparkMaxConfig()
         brake = leaderConfig.setIdleMode(idleMode=leaderConfig.IdleMode.kBrake)
         limit = leaderConfig.smartCurrentLimit(30)
-
+        
         leaderConfig.apply(brake)
         leaderConfig.apply(limit)
         
-        self.elevatorMoveMotor1.configure(leaderConfig, self.elevatorMoveMotor1.ResetMode.kNoResetSafeParameters, self.elevatorMoveMotor1.PersistMode.kPersistParameters)     
+        self.elevatorMoveMotor1.configure(leaderConfig, self.elevatorMoveMotor1.ResetMode.kResetSafeParameters, self.elevatorMoveMotor1.PersistMode.kPersistParameters)     
 
         #Config Elevator motor ID 11
         followerConfig = rev.SparkMaxConfig()
@@ -37,11 +41,10 @@ class Elevator(Subsystem):
         followerConfig.apply(brake)
         followerConfig.apply(limit)
 
-        self.elevatorMoveMotor2.configure(followerConfig, self.elevatorMoveMotor2.ResetMode.kNoResetSafeParameters, self.elevatorMoveMotor2.PersistMode.kPersistParameters)
-
-        #
-        self.constraints = TrapezoidProfile(1.0, 0.5)
-        self.PIDcontroller = wpimath.controller.ProfiledPIDController(0.4, 0.0, 0.0, self.constraints)
+        self.elevatorMoveMotor2.configure(followerConfig, self.elevatorMoveMotor2.ResetMode.kResetSafeParameters, self.elevatorMoveMotor2.PersistMode.kPersistParameters)
+        
+        self.constraints = TrapezoidProfile.Constraints(1, 0.7)
+        self.PIDcontroller = wpimath.controller.ProfiledPIDController(1, 0.0, 0.0, self.constraints)
 
         self.feedForward = wpimath.controller.ElevatorFeedforward(0.1, 0.02, 0.6) #Retune pls
 
@@ -53,4 +56,19 @@ class Elevator(Subsystem):
 
     def setL1(self):
         self.goal = TrapezoidProfile.State(5, 0)
+        
+        calculatePID = self.PIDcontroller.calculate(self.elevatorEncoder.getPosition(), self.goal.position)
+        calculateFF = self.feedForward.calculate(rpm2rps(self.elevatorEncoder.getVelocity()), self.goal.velocity)
+        
+        self.elevatorMoveMotor1.setVoltage(calculatePID + calculateFF)
+        self.elevatorMoveMotor2.setVoltage(calculatePID + calculateFF)
+        
+    def setL2(self):
+        self.goal = TrapezoidProfile.State(15, 0)
+        
+        calculatePID = self.PIDcontroller.calculate(self.elevatorEncoder.getPosition(), self.goal.position)
+        calculateFF = self.feedForward.calculate(rpm2rps(self.elevatorEncoder.getVelocity()), self.goal.velocity)
+        
+        self.elevatorMoveMotor1.setVoltage(calculatePID + calculateFF)
+        self.elevatorMoveMotor2.setVoltage(calculatePID + calculateFF) #Figure out sparkMAX Follower mode
         
