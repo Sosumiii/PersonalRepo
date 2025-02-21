@@ -49,6 +49,8 @@ class MyRobot(commands2.TimedCommandRobot):
         self.controller = wpilib.XboxController(0)
         self.elevator = Elevator()
         self.drivetrain = drivetrain
+        
+        self.pdp = wpilib.PowerDistribution()
 
         self.orchestra = phoenix6.Orchestra()
         
@@ -90,17 +92,10 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def robotPeriodic(self): 
         self.drivetrain.updateOdometry()        
-        wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)
-        wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
         
-        wpilib.SmartDashboard.putNumber("FRD Temp", self.drivetrain.frSM.driveMotor.get_device_temp().value_as_double)
-        wpilib.SmartDashboard.putNumber("FRR Temp", self.drivetrain.frSM.rotationMotor.getMotorTemperature())
-
-        wpilib.SmartDashboard.putNumber("BLD Temp", self.drivetrain.blSM.driveMotor.get_device_temp().value_as_double)
-        wpilib.SmartDashboard.putNumber("BLR Temp", self.drivetrain.blSM.rotationMotor.getMotorTemperature())
-
-        wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.get_device_temp().value_as_double)
-        wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
+        self.getTemps()
+        self.getCurrents()
+        self.getPDPStats()
        
 
         return super().robotPeriodic()
@@ -118,6 +113,9 @@ class MyRobot(commands2.TimedCommandRobot):
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())
         self.rot = self.applyDeadband(self.controller.getRightX())
+        
+        if (self.controller.getRightBumper()):
+            self.drivetrain.reset()
 
 
         if (self.xSpeed == 0 and self.ySpeed == 0 and self.rot == 0):
@@ -133,3 +131,33 @@ class MyRobot(commands2.TimedCommandRobot):
     def autoDrive(self) -> None:
         speeds = ChassisSpeeds.fromRobotRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
         self.drivetrain.driveRO(speeds)
+        
+    def getTemps(self):
+        wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)
+        wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
+        
+        wpilib.SmartDashboard.putNumber("FRD Temp", self.drivetrain.frSM.driveMotor.get_device_temp().value_as_double)
+        wpilib.SmartDashboard.putNumber("FRR Temp", self.drivetrain.frSM.rotationMotor.getMotorTemperature())
+
+        wpilib.SmartDashboard.putNumber("BLD Temp", self.drivetrain.blSM.driveMotor.get_device_temp().value_as_double)
+        wpilib.SmartDashboard.putNumber("BLR Temp", self.drivetrain.blSM.rotationMotor.getMotorTemperature())
+
+        wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.get_device_temp().value_as_double)
+        wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
+        
+    def getCurrents(self):
+        wpilib.SmartDashboard.putNumber("FLD current", self.drivetrain.flSM.driveMotor.get_stator_current().value_as_double)
+        wpilib.SmartDashboard.putNumber("FLR current", self.drivetrain.flSM.rotationMotor.getOutputCurrent())
+        
+        wpilib.SmartDashboard.putNumber("FRD current", self.drivetrain.frSM.driveMotor.get_stator_current().value_as_double)
+        wpilib.SmartDashboard.putNumber("FRR current", self.drivetrain.frSM.rotationMotor.getOutputCurrent())
+
+        wpilib.SmartDashboard.putNumber("BLD current", self.drivetrain.blSM.driveMotor.get_stator_current().value_as_double)
+        wpilib.SmartDashboard.putNumber("BLR current", self.drivetrain.blSM.rotationMotor.getOutputCurrent())
+
+        wpilib.SmartDashboard.putNumber("BRD current", self.drivetrain.brSM.driveMotor.get_stator_current().value_as_double)
+        wpilib.SmartDashboard.putNumber("BRR current", self.drivetrain.brSM.rotationMotor.getOutputCurrent())
+        
+    def getPDPStats(self):
+        wpilib.SmartDashboard.putNumber("Total Current Draw", self.pdp.getTotalCurrent())
+        wpilib.SmartDashboard.putNumber("Total Power Draw", self.pdp.getTotalPower())
