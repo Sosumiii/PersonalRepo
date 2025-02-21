@@ -5,9 +5,9 @@ public class StandardArrayAlgorithms
 {
   public static void main(String[] args)
   {
-    int[] goals = {1, 2, 0, 3, 2, 4, 2, 1, 0, 2, 0, 1, 3, 2};
+    int[] goals = {1, 2, 0, 3, 2, 4, 2, 1, 1};
     
-    double sum = 0;
+    /* double sum = 0;
     for (int i = 0; i < goals.length; i++)
     {
       sum += goals[i];
@@ -30,11 +30,29 @@ public class StandardArrayAlgorithms
       {
         min = goals[g];
       }
+    } */
+
+    /* System.out.println("Max: " + max);
+    System.out.println("Min: " + min); */
+
+    /* 
+     * The algorithm below requires there to be a list of 10 values. Any list comtaining greater than 10 variables will not be counted by the algorithm.
+     */
+    int[] goalCounter = new int[10];
+    
+    for (int g : goals)
+    {
+      if (g >= 0 && g <=9)
+      {
+        goalCounter[g]++;
+      }
     }
 
-    System.out.println("Max: " + max);
-    System.out.println("Min: " + min);
-
+    for (int i = 0; i <= 9; i++)
+    {
+      System.out.println(goalCounter[i]);
+    }
+    
     
     
   }
