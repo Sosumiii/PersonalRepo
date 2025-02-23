@@ -1,26 +1,22 @@
 
 import commands2
 import ntcore
-import pathplannerlib.auto
 import pathplannerlib.config
 import wpilib
 import wpilib.simulation
-import phoenix6
-import wpimath
 import wpilib.drive
-import wpimath.filter
 import wpimath.controller
 import wpimath.geometry
 import wpimath.kinematics
-from Subsystems.drivetrain import Drivetrain
 import pathplannerlib
 import elasticlib
-from wpilib import DriverStation
+from Subsystems.drivetrain import Drivetrain
+from Subsystems.Limelight import limelight
+from Subsystems.LED import led
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 from pathplannerlib.auto import AutoBuilder, PathPlannerAuto
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
-from wpilib import SmartDashboard
 from Subsystems.elevator import Elevator
 
 drivetrain = Drivetrain()
@@ -43,16 +39,15 @@ AutoBuilder.configure(
 class MyRobot(commands2.TimedCommandRobot):
     def robotInit(self) -> None:
         """Robot initialization function"""
-        #print("Robot Initialized!")
-        self.test = "Test"
-
         self.controller = wpilib.XboxController(0)
         self.elevator = Elevator()
         self.drivetrain = drivetrain
-        
-        self.pdp = wpilib.PowerDistribution()
+        self.limelight = limelight()
+        self.led = led()
 
-        self.orchestra = phoenix6.Orchestra()
+        self.test = "Test"
+        
+        self.pdp = wpilib.PowerDistribution(1, wpilib.PowerDistribution.ModuleType.kRev)
         
         # get the default instance of NetworkTables
         nt = ntcore.NetworkTableInstance.getDefault()
@@ -60,15 +55,6 @@ class MyRobot(commands2.TimedCommandRobot):
         # Start publishing an array of module states with the "/SwerveStates" key
         topic = nt.getStructArrayTopic("/SwerveStates", SwerveModuleState)
         self.pub = topic.publish()
-        self.autoCommand = None
-
-        self.orchestra.add_instrument(self.drivetrain.blSM.driveMotor)
-
-        self.status = self.orchestra.load_music("TestTrackChirp.chrp")
-
-        if not self.status.is_ok():
-            print("DONT PLAY IT PLZ")
-
 
         self.timer = wpilib.Timer()
         self.timer.start()
@@ -92,7 +78,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def robotPeriodic(self): 
         self.drivetrain.updateOdometry()        
-        
         self.getTemps()
         self.getCurrents()
         self.getPDPStats()
@@ -104,8 +89,18 @@ class MyRobot(commands2.TimedCommandRobot):
         return value if abs(value) > deadband else 0
     
     def testInit(self):
-        self.orchestra.play()
         return super().testInit()
+    
+    def testPeriodic(self):
+        self.elevator.manualControl(self.applyDeadband(-self.controller.getLeftY()) / 2)
+
+        if (self.limelight.targetCheck()):
+            self.led.green()
+        else:
+            self.led.red()
+
+            
+        return super().testPeriodic()
 
     def teleopPeriodic(self) -> None:        
         self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.brSM.getState()])    
