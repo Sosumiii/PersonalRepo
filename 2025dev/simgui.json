@@ -1,11 +1,15 @@
 {
   "HALProvider": {
-    "Other Devices": {
-      "AnalogEncoder[1]": {
-        "header": {
-          "open": true
-        }
+    "Addressable LEDs": {
+      "0": {
+        "columns": 1,
+        "serpentine": true
       },
+      "window": {
+        "visible": true
+      }
+    },
+    "Other Devices": {
       "Pigeon 2 (v6)[8]": {
         "header": {
           "open": true
@@ -16,37 +20,7 @@
           "open": true
         }
       },
-      "SPARK MAX [10]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [11]": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK MAX [1]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [2]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [4]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [6]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [8]": {
         "header": {
           "open": true
         }
@@ -70,16 +44,11 @@
         "header": {
           "open": true
         }
-      },
-      "Talon FX (v6)[1]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[3]": {
-        "header": {
-          "open": true
-        }
+      }
+    },
+    "RoboRIO": {
+      "6V Rail": {
+        "open": true
       }
     }
   },

@@ -92,13 +92,13 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().testInit()
     
     def testPeriodic(self):
-        self.elevator.manualControl(self.applyDeadband(-self.controller.getLeftY()) / 2)
+        """ self.elevator.manualControl(self.applyDeadband(-self.controller.getLeftY()) / 2)
 
         if (self.limelight.targetCheck()):
             self.led.green()
         else:
-            self.led.red()
-
+            self.led.red() """
+        self.led.rainbow()
             
         return super().testPeriodic()
 

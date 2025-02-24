@@ -1,7 +1,10 @@
 from wpilib import Color, AddressableLED, Timer
+import wpilib
 import commands2
+import math
 
 kLedBuffer = 150
+kBreathingSpeed = 2
 
 class led(commands2.Subsystem):
     def __init__(self):
@@ -9,13 +12,14 @@ class led(commands2.Subsystem):
         self.timer = Timer()
 
         self.led.setLength(kLedBuffer)
-        self.rainbowFirstHue = 0
+        self.rainbowFirstPixelHue = 0
 
         self.ledData = [AddressableLED.LEDData() for _ in range(kLedBuffer)]
 
         self.led.setData(self.ledData)
         self.timer.start()
         self.led.start()
+        
 
         super().__init__()
 
@@ -30,7 +34,7 @@ class led(commands2.Subsystem):
             self.ledData[i].setHSV(int(hue), 255, 128)
 
         # Increase by to make the rainbow "move"
-        self.rainbowFirstPixelHue += 3
+        self.rainbowFirstPixelHue += 1
 
         # Check bounds
         self.rainbowFirstPixelHue %= 180
@@ -47,20 +51,42 @@ class led(commands2.Subsystem):
         for i in range(kLedBuffer):
             self.ledData[i].setLED(Color.kGreen)
 
+        self.led.setData(self.ledData)
+
     def off(self):
         for i in range(kLedBuffer):
             self.ledData[i].setLED(Color.kBlack)
 
         self.led.setData(self.ledData)
 
-    def greenFlash(self):
-        if (self.timer.get() > 0.5):
-            self.off()
-            #print("off")
-        elif (self.timer.get() < 0.5):
+    def greenBlink(self):
+        if self.timer.get() < 0.5:
             self.green()
-            #print("green")
+        else:
+            self.off()
 
-        if (self.timer.get() > 1):
+        if self.timer.get() > 1.0:
             self.timer.reset()
+    
+    def redBlink(self):
+        if self.timer.get() < 0.5:
+            self.red()
+        else:
+            self.off()
+
+        if self.timer.get() > 1.0:
+            self.timer.reset()
+
+    def greenBreathing(self):
+        brightness = int((math.sin(self.timer.get()) + 1) / kBreathingSpeed * 255)
+
+        for i in range(kLedBuffer):
+            self.ledData[i].setRGB(0, brightness, 0)
+        
+        self.led.setData(self.ledData)
             
+    def white(self):
+        for i in range(kLedBuffer):
+            self.ledData[i].setLED(Color.kWhite)
+
+        self.led.setData(self.ledData)
