@@ -48,6 +48,8 @@ class MyRobot(commands2.TimedCommandRobot):
         self.test = "Test"
         
         self.pdp = wpilib.PowerDistribution(1, wpilib.PowerDistribution.ModuleType.kRev)
+
+        commands2.InstantCommand(self.drivetrain.stopDrivetrain(), self)
         
         # get the default instance of NetworkTables
         nt = ntcore.NetworkTableInstance.getDefault()
@@ -98,7 +100,7 @@ class MyRobot(commands2.TimedCommandRobot):
             self.led.green()
         else:
             self.led.red() """
-        self.led.rainbow()
+        self.led.white()
             
         return super().testPeriodic()
 

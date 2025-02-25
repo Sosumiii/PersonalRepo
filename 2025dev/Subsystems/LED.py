@@ -87,6 +87,6 @@ class led(commands2.Subsystem):
             
     def white(self):
         for i in range(kLedBuffer):
-            self.ledData[i].setLED(Color.kWhite)
+            self.ledData[i].setHSV(0, 0, 128)
 
         self.led.setData(self.ledData)

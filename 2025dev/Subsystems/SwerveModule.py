@@ -17,7 +17,7 @@ kMaxAngularAcceleration = math.tau
 kGearRatio = 6.75
 
 def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
-    return (EncoderPosition * math.pi * (2*kWheelRadius) / (kDriveEncoderRes * kGearRatio))
+    return (EncoderPosition / kGearRatio) * (2 * math.pi * kWheelRadius)
 
 def rps2mps(rotations) -> float: #Converts from rotations per second to meters per Second
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
@@ -59,22 +59,17 @@ class swerveModule(commands2.Subsystem):
         motorConfig.with_motor_output(brake)
         motorConfig.serialize()
 
+        self.driveMotor.configurator.apply(motorConfig)
+
         rotationConfig = rev.SparkMaxConfig()
-        limits = rotationConfig.smartCurrentLimit(40)
-        brake = rotationConfig.setIdleMode(rotationConfig.IdleMode.kBrake)
+        rotationConfig.smartCurrentLimit(40)
+        rotationConfig.setIdleMode(rotationConfig.IdleMode.kBrake)
 
-        rotationConfig.apply(brake)
-        rotationConfig.apply(limits)
-        self.rotationMotor.configure(rotationConfig, self.rotationMotor.ResetMode.kResetSafeParameters, self.rotationMotor.PersistMode.kPersistParameters)
-
-        #self.rotationEncoder.setVoltagePercentageRange(0, 1)
-
-        #Motor setup
-        #self.control = phoenix6.controls.voltage_out.VoltageOut(0.0)
+        self.rotationMotor.configure(rotationConfig, self.rotationMotor.ResetMode.kResetSafeParameters, self.rotationMotor.PersistMode.kNoPersistParameters)
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            0.33,  # Proportional gain
+            1,  # Proportional gain
             0.0,   # Integral gain
             0.0,   # Derivative gain
         )

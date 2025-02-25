@@ -16,10 +16,10 @@ import Subsystems.SwerveModule as SM
 class Drivetrain(commands2.Subsystem):
     def __init__(self):
         #SwerveModule/hardware init
-        self.flSM = SM.swerveModule(1, 2, 0, 0.592, 0.25, 0.0, 0.00)
-        self.frSM = SM.swerveModule(3, 4, 1, 0.867, 0.25, 0.0, 0.00)
+        self.flSM = SM.swerveModule(1, 2, 0, 0.587, 0.25, 0.0, 0.00)
+        self.frSM = SM.swerveModule(3, 4, 1, 0.870, 0.25, 0.0, 0.00)
         self.blSM = SM.swerveModule(5, 6, 2, 0.520, 0.25, 0.0, 0.0) 
-        self.brSM = SM.swerveModule(7, 8, 3, 0.767, 0.25, 0.0, 0.00)
+        self.brSM = SM.swerveModule(7, 8, 3, 0.814, 0.25, 0.0, 0.00)
 
         self.gyro = phoenix6.hardware.Pigeon2(9)
         self.gyro.set_yaw(0)
@@ -88,7 +88,7 @@ class Drivetrain(commands2.Subsystem):
         swerveModuleStates = self.kinematics.toSwerveModuleStates(speeds)
         
         SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
+            swerveModuleStates, 4.72 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
         )
 
         self.flSM.setState(swerveModuleStates[0])
@@ -111,7 +111,7 @@ class Drivetrain(commands2.Subsystem):
         swerveModuleStates = self.kinematics.toSwerveModuleStates(speeds)
         
         wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 4.0 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
+            swerveModuleStates, 4.72 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
         )
         
         self.flSM.setState(swerveModuleStates[0])
