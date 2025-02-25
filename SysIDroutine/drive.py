@@ -19,7 +19,7 @@ kMaxAngularAcceleration = math.tau
 kGearRatio = 6.75
 
 def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
-    return (EncoderPosition * math.pi * (2*kWheelRadius) / (kDriveEncoderRes * kGearRatio))
+    return (EncoderPosition / kGearRatio) * (2 * math.pi * kWheelRadius)
 
 def rps2mps(rotations) -> float: #Converts from rotations per second to meters per Second
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
