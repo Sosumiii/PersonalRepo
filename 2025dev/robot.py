@@ -27,8 +27,8 @@ AutoBuilder.configure(
     drivetrain.getChassisSpeeds,
     lambda speeds, feedforwards: drivetrain.driveRO(speeds),
     PPHolonomicDriveController(
-        PIDConstants(0.001, 0.0, 0.0),
-        PIDConstants(0.001, 0.0, 0.0),
+        PIDConstants(0.1, 0.0, 0.0),
+        PIDConstants(0.01, 0.0, 0.0),
     ),
     RobotConfig.fromGUISettings(),
     drivetrain.shouldFlipPath,
@@ -74,20 +74,22 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().autonomousInit()
         
     def autonomousPeriodic(self):
-        self.drivetrain.updateOdometry()
+        #self.drivetrain.updateOdometry()
         return super().autonomousPeriodic()
 
 
     def robotPeriodic(self): 
-        self.drivetrain.updateOdometry()        
+        self.drivetrain.updateOdometry()  
+        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.brSM.getState()])    
+      
         self.getTemps()
         self.getCurrents()
-        self.getPDPStats()
+        #self.getPDPStats()
        
 
         return super().robotPeriodic()
 
-    def applyDeadband(self, value, deadband=0.12):
+    def applyDeadband(self, value, deadband=0.08):
         return value if abs(value) > deadband else 0
     
     def testInit(self):
@@ -105,7 +107,6 @@ class MyRobot(commands2.TimedCommandRobot):
         return super().testPeriodic()
 
     def teleopPeriodic(self) -> None:        
-        self.pub.set([self.drivetrain.flSM.getState(),self.drivetrain.frSM.getState(),self.drivetrain.blSM.getState(),self.drivetrain.brSM.getState()])    
         
         self.xSpeed = self.applyDeadband(self.controller.getLeftY())
         self.ySpeed = self.applyDeadband(self.controller.getLeftX())

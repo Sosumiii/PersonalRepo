@@ -17,7 +17,7 @@ kMaxAngularAcceleration = math.tau
 kGearRatio = 6.75
 
 def talonFXtoDistance(EncoderPosition) -> float: #Converts the current position of the Motor (rotations) into a unit of distance traveled (Meters)
-    return (EncoderPosition / kGearRatio) * (2 * math.pi * kWheelRadius)
+    return ((EncoderPosition / kGearRatio) * (2 * math.pi * kWheelRadius))
 
 def rps2mps(rotations) -> float: #Converts from rotations per second to meters per Second
     return ((rotations * (2 * math.pi * kWheelRadius)) / kGearRatio)
@@ -69,7 +69,7 @@ class swerveModule(commands2.Subsystem):
     
         #PID Setup
         self.drivePIDController = wpimath.controller.PIDController(
-            1,  # Proportional gain
+            0.26,  # Proportional gain (James Bond 007)
             0.0,   # Integral gain
             0.0,   # Derivative gain
         )
@@ -123,7 +123,7 @@ class swerveModule(commands2.Subsystem):
 
         rotationOutput = self.rotationPIDController.calculate(encToRad(self.rotationEncoder.get()), newState.angle.radians())
 
-        self.driveMotor.setVoltage((newState.speed / 4.72) * 12)
+        self.driveMotor.set((newState.speed / 4.6) * 12)
         self.rotationMotor.set(rotationOutput)
 
     def stopAllMotors(self):
