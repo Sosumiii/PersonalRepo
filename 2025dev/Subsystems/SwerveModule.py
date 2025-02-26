@@ -123,7 +123,7 @@ class swerveModule(commands2.Subsystem):
 
         rotationOutput = self.rotationPIDController.calculate(encToRad(self.rotationEncoder.get()), newState.angle.radians())
 
-        self.driveMotor.setVoltage((newState.speed / 4.6) * 12)
+        self.driveMotor.setVoltage((newState.speed / 4.72) * 12)
         self.rotationMotor.set(rotationOutput)
 
     def stopAllMotors(self):

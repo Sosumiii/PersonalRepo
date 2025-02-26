@@ -25,10 +25,10 @@ AutoBuilder.configure(
     drivetrain.getPose,
     drivetrain.resetPose,
     drivetrain.getChassisSpeeds,
-    lambda speeds, feedforwards: drivetrain.driveRO(speeds),
+    lambda speeds, feedforwards: drivetrain.drive(speeds),
     PPHolonomicDriveController(
-        PIDConstants(0.1, 0.0, 0.0),
-        PIDConstants(0.01, 0.0, 0.0),
+        PIDConstants(0, 0.0, 0.0),
+        PIDConstants(3, 0.0, 0.0),
     ),
     RobotConfig.fromGUISettings(),
     drivetrain.shouldFlipPath,
@@ -57,6 +57,9 @@ class MyRobot(commands2.TimedCommandRobot):
         # Start publishing an array of module states with the "/SwerveStates" key
         topic = nt.getStructArrayTopic("/SwerveStates", SwerveModuleState)
         self.pub = topic.publish()
+        
+        self.field = wpilib.Field2d()
+        # Do this in either robot or subsystem init
 
         self.timer = wpilib.Timer()
         self.timer.start()
@@ -84,6 +87,10 @@ class MyRobot(commands2.TimedCommandRobot):
       
         self.getTemps()
         self.getCurrents()
+        
+        wpilib.SmartDashboard.putData("Field", self.field)
+        # Do this in either robot periodic or subsystem periodic
+        self.field.setRobotPose(self.drivetrain.odometry.getPose())
         #self.getPDPStats()
        
 
@@ -124,11 +131,11 @@ class MyRobot(commands2.TimedCommandRobot):
             
     def manualDrive(self) -> None:
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
-        self.drivetrain.driveFO(speeds)
+        self.drivetrain.drive(speeds)
 
     def autoDrive(self) -> None:
         speeds = ChassisSpeeds.fromRobotRelativeSpeeds(-self.xSpeed, -self.ySpeed, -self.rot, self.drivetrain.gyro.getRotation2d())
-        self.drivetrain.driveRO(speeds)
+        self.drivetrain.drive(speeds)
         
     def getTemps(self):
         wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)

@@ -69,7 +69,22 @@ class Drivetrain(commands2.Subsystem):
         return self.odometry.getPose()
     
     def resetPose(self, pose2d: wpimath.geometry.Pose2d):
-        self.odometry.resetPose(pose2d)
+        """
+        Reset the tracking system.
+        """
+        self.gyro.set_yaw(0)
+
+        self.odometry = SwerveDrive4Odometry(
+            self.kinematics,
+            Rotation2d(),
+            (
+                self.flSM.getPosition(),
+                self.frSM.getPosition(),
+                self.blSM.getPosition(),
+                self.brSM.getPosition()
+            ),
+            pose2d
+        )
     
     def getChassisSpeeds(self):
         return self.chassisSpeeds
@@ -80,7 +95,7 @@ class Drivetrain(commands2.Subsystem):
         # THE ORIGIN WILL REMAIN ON THE BLUE SIDE
         return DriverStation.getAlliance() == DriverStation.Alliance.kRed
 
-    def driveFO(self, speeds: ChassisSpeeds) -> None:
+    def drive(self, speeds: ChassisSpeeds) -> None:
                 
         speeds = ChassisSpeeds(speeds.vx, speeds.vy, speeds.omega)
 
@@ -92,29 +107,6 @@ class Drivetrain(commands2.Subsystem):
         )
 
 
-        self.flSM.setState(swerveModuleStates[0])
-        self.frSM.setState(swerveModuleStates[1])
-        self.blSM.setState(swerveModuleStates[2])
-        self.brSM.setState(swerveModuleStates[3])
-        
-
-        
-    def driveRO(self, speeds: ChassisSpeeds) -> None:        
-        """
-        Method to drive the robot in Robot Relative mode.
-        :param xSpeed: Speed of the robot in the x direction (forward).
-        :param ySpeed: Speed of the robot in the y direction (sideways).
-        :param rot: Angular rate of the robot.
-        """
-
-        speeds = ChassisSpeeds(speeds.vx, speeds.vy, speeds.omega)
-
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(speeds)
-        
-        wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 4.72 #should be 4.6 (MK4I) or 4.72 (Thrifty Bot Swerve) m/s free speed
-        )
-        
         self.flSM.setState(swerveModuleStates[0])
         self.frSM.setState(swerveModuleStates[1])
         self.blSM.setState(swerveModuleStates[2])

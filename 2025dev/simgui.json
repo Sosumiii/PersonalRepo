@@ -25,6 +25,26 @@
           "open": true
         }
       },
+      "SPARK MAX [2]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [4]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [6]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [8]": {
+        "header": {
+          "open": true
+        }
+      },
       "Talon FX (v6)[0]": {
         "header": {
           "open": true
@@ -79,6 +99,12 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Field": {
+          "double[]##v_/SmartDashboard/Field/Robot": {
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       }
     }
