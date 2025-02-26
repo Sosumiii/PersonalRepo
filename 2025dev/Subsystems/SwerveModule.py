@@ -118,12 +118,12 @@ class swerveModule(commands2.Subsystem):
         newState.optimize(Rotation2d(encToRad(self.rotationEncoder.get())))
         newState.cosineScale(Rotation2d(encToRad(self.rotationEncoder.get())))
 
-        driveOutput = self.drivePIDController.calculate(self.driveMotor.get(), newState.speed)
+        driveOutput = self.drivePIDController.calculate(rps2mps(self.driveMotor.get_velocity().value_as_double), newState.speed)
         driveFF = self.driveMotorFeedForward.calculate(newState.speed)
 
         rotationOutput = self.rotationPIDController.calculate(encToRad(self.rotationEncoder.get()), newState.angle.radians())
 
-        self.driveMotor.set(driveOutput)
+        self.driveMotor.setVoltage((newState.speed / 4.72) * 12)
         self.rotationMotor.set(rotationOutput)
 
     def stopAllMotors(self):
