@@ -41,6 +41,12 @@ public class MemoryGame
       System.out.println(n);
       String guess = gui.playSequence(r, time);
 
+      if (guess == null)
+      {
+        play = false;
+        break;
+      }
+
 
       guess = guess.replaceAll("[^a-zA-Z]", "");
       guess = guess.toLowerCase();
@@ -57,6 +63,11 @@ public class MemoryGame
           r = RandomPermutation.next(letters, letters.length);
         }
 
+      }
+
+      else if (guess.equals(""))
+      {
+        gui.tryAgain();
       }
 
       else
