@@ -16,13 +16,24 @@ import Subsystems.SwerveModule as SM
 class Drivetrain(commands2.Subsystem):
     def __init__(self):
         #SwerveModule/hardware init
-        self.flSM = SM.swerveModule(1, 2, 0, 0.592, 0.555, 0.0, 0.002)
-        self.frSM = SM.swerveModule(3, 4, 1, 0.867, 0.505, 0.0, 0.001)
-        self.blSM = SM.swerveModule(5, 6, 2, 0.520, 0.51, 0.0, 0.002) 
-        self.brSM = SM.swerveModule(7, 8, 3, 0.814, 0.52, 0.0, 0.00)
+        self.flSM = SM.swerveModule(1, 2, 0, 0.592)
+        self.frSM = SM.swerveModule(3, 4, 1, 0.867)
+        self.blSM = SM.swerveModule(5, 6, 2, 0.520) 
+        self.brSM = SM.swerveModule(7, 8, 3, 0.814)
 
         self.gyro = phoenix6.hardware.Pigeon2(9)
         self.gyro.set_yaw(0)
+
+        self.flSM.setDrivePID(3.868, 0.0, 0.054807)
+        self.frSM.setDrivePID(0.505, 0.0, 0.001)
+        self.blSM.setDrivePID(0.51, 0.0, 0.002)
+        self.brSM.setDrivePID(0.52, 0.0, 0.00)
+
+        self.flSM.setRotationPID(0.555, 0.0, 0.002)
+        self.frSM.setRotationPID(0.505, 0.0, 0.001)
+        self.blSM.setRotationPID(0.51, 0.0, 0.002)
+        self.brSM.setRotationPID(0.52, 0.0, 0.00)
+        
 
         self.chassisSpeeds = ChassisSpeeds(0, 0, 0)
 

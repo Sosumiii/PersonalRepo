@@ -3,6 +3,7 @@ import phoenix6
 import math
 import wpilib
 import commands2
+import wpilib.counter
 import wpimath.controller
 import wpimath.kinematics
 import wpimath.units
@@ -26,16 +27,17 @@ def encToRad(value): #converts the encoder value (a range from 0 to 1) to a valu
     radians = (value - 0.5) * 2 *math.pi
     return radians
 
+def setDrivePID(kP: float, kI: float, kD: float):
+    wpimath.controller.PIDController(kP, kI, kD)
+
+
 class swerveModule(commands2.Subsystem):
     def __init__(
         self,
         DriveMotorID: int,
         RotationMotorID: int,
         RotationEncoderPort: int,
-        EncoderOffset: float,
-        RotationkP: float,
-        RotationkI: float,
-        RotationkD: float
+        EncoderOffset: float
         ) -> None:
 
         """
@@ -66,29 +68,32 @@ class swerveModule(commands2.Subsystem):
         rotationConfig.setIdleMode(rotationConfig.IdleMode.kBrake)
 
         self.rotationMotor.configure(rotationConfig, self.rotationMotor.ResetMode.kResetSafeParameters, self.rotationMotor.PersistMode.kNoPersistParameters)
-    
-        #PID Setup
-        self.drivePIDController = wpimath.controller.PIDController(
-            0.26,  # Proportional gain (James Bond 007)
-            0.0,   # Integral gain
-            0.0,   # Derivative gain
-        )
-        
-        self.rotationPIDController = wpimath.controller.PIDController(
-            RotationkP,  # Proportional gain
-            RotationkI,   # Integral gain
-            RotationkD,   # Derivative gain
-        )
 
-        self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
-        self.rotationPIDController.setSetpoint(0.0)
         
         #Feed Forward Control
-        self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 2)
+        self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(0.069667, 0.017075)
         self.rotationMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(1, 0.5)
 
 
         super().__init__()
+
+    def setDrivePID(self, kP: float, kI: float, kD: float):
+        self.drivePIDController = wpimath.controller.PIDController(
+            kP,  # Proportional gain
+            kI,   # Integral gain
+            kD,   # Derivative gain
+            
+        )
+    
+    def setRotationPID(self, kP: float, kI: float, kD: float):
+        self.rotationPIDController = wpimath.controller.PIDController(
+            kP,  # Proportional gain
+            kI,   # Integral gain
+            kD,   # Derivative gain
+        )
+
+        self.rotationPIDController.enableContinuousInput(-math.pi, math.pi)
+        self.rotationPIDController.setSetpoint(0.0)
         
     def getState(self):
         """
@@ -123,7 +128,8 @@ class swerveModule(commands2.Subsystem):
 
         rotationOutput = self.rotationPIDController.calculate(encToRad(self.rotationEncoder.get()), newState.angle.radians())
 
-        self.driveMotor.setVoltage((newState.speed / 4.72) * 12)
+        #self.driveMotor.setVoltage((newState.speed / 4.72) * 13)
+        self.driveMotor.setVoltage(driveOutput + driveFF)
         self.rotationMotor.set(rotationOutput)
 
     def stopAllMotors(self):

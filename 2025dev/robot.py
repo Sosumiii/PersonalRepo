@@ -27,8 +27,8 @@ AutoBuilder.configure(
     drivetrain.getChassisSpeeds,
     lambda speeds, feedforwards: drivetrain.drive(speeds),
     PPHolonomicDriveController(
-        PIDConstants(0, 0.0, 0.0),
-        PIDConstants(3, 0.0, 0.0),
+        PIDConstants(5.3, 0.0, 0.0),
+        PIDConstants(5.6, 0.0, 0.0),
     ),
     RobotConfig.fromGUISettings(),
     drivetrain.shouldFlipPath,
@@ -45,7 +45,7 @@ class MyRobot(commands2.TimedCommandRobot):
         self.limelight = limelight()
         self.led = led()
 
-        self.test = "Test"
+        self.square = "Test"
         
         self.pdp = wpilib.PowerDistribution(1, wpilib.PowerDistribution.ModuleType.kRev)
 
@@ -65,7 +65,7 @@ class MyRobot(commands2.TimedCommandRobot):
         self.timer.start()
  
     def getAutoCommand(self):
-        self.autoSelected = self.test
+        self.autoSelected = self.square
         auto = PathPlannerAuto(self.autoSelected)
 
         return auto
@@ -115,9 +115,15 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def teleopPeriodic(self) -> None:        
         
-        self.xSpeed = self.applyDeadband(self.controller.getLeftY())
-        self.ySpeed = self.applyDeadband(self.controller.getLeftX())
-        self.rot = self.applyDeadband(self.controller.getRightX())
+        self.xSpeed = self.applyDeadband(self.controller.getLeftY()) * 2
+        self.ySpeed = self.applyDeadband(self.controller.getLeftX()) * 2
+        
+
+        if (self.limelight.aim() > 0 and self.controller.getLeftTriggerAxis() >= 1):
+            self.rot = self.limelight.aim()
+
+        else:
+            self.rot = self.applyDeadband(self.controller.getRightX()) * 2
         
         if (self.controller.getRightBumper()):
             self.drivetrain.reset()
