@@ -18,49 +18,60 @@ public class MemoryGame
     // and turn randomization on or off.)
     boolean play = true;
     MemoryGameGUI gui = new MemoryGameGUI();
-    /* String[] letters = {"a", "b", "c", "d", "e"};
-    //gui.createBoard(5, true);
+    gui.createBoard(3, true);
+
+    String[] letters = {"a", "b", "c", "d", "e"};
+    int rounds = 1;
+    int score = 0;
+    double time = 1.0;
+
     String[] r = RandomPermutation.next(letters, letters.length);
-    String n = "";
 
-    for (int i = 0; i < r.length; i++)
-    {
-      n+= r[i];
-    } */
-
-    //System.out.println(n);
-    //gui.createBoard(1, true);
-    //gui.playSequence(r, 1);
-
-    String input = "sdSjfb'b e";
-
-    System.out.println(input.length());
-
-    input = input.replaceAll("[^a-zA-Z]", "");
-    input = input.toLowerCase();
-
-    System.out.println(input);
-    
-    /* for (int i = 0; i < input.length() - 1; i++)
-    {
-      String character = input.substring(i, i++);
-      if (character.)
-      {
-        input.replaceAll(",", "");
-        input.replaceAll(" ", "");
-      }
-    } */
-
-    
-    
-
+    //gui.createBoard(5, true);
 
     // Play the game until user wants to quit.
-    /* while (!play)
+    while (play)
     {
+      String n = "";
+
+      for (String r1 : r) {
+          n += r1;
+      }
       
+      System.out.println(n);
+      String guess = gui.playSequence(r, time);
+
+
+      guess = guess.replaceAll("[^a-zA-Z]", "");
+      guess = guess.toLowerCase();
+
+      if (guess.equals(n))
+      {
+        gui.matched();
+        score++;
+        play = gui.playAgain();
+        if (play)
+        {
+          rounds++;
+          time -= 0.2;
+          r = RandomPermutation.next(letters, letters.length);
+        }
+
+      }
+
+      else
+      {
+        gui.tryAgain();
+        rounds++;
+      }
       
-    } */
+    }
+
+    gui.showScore(score, rounds);
+    gui.quit();
+    
+
+
       // Create a new array that will contain the randomly ordered memory strings.
 
       // Create a list of randomly ordered integers with no repeats, the length

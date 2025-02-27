@@ -8,9 +8,9 @@
  * 6/1/2019
  * Copyright(c) 2019 PLTW to present. All rights reserved
  **********************************************************************/
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * Class to play Memory Game.
@@ -164,7 +164,7 @@ public class MemoryGameGUI extends JFrame
    */
   public void showScore(int score, int rounds)
   {
-    JOptionPane.showMessageDialog(this, "You scored " + score + " out of " + rounds, "Score Summary", JOptionPane.PLAIN_MESSAGE);
+    JOptionPane.showMessageDialog(this, "You scored " + score + " out of " + rounds + " rounds.", "Score Summary", JOptionPane.PLAIN_MESSAGE);
   }
   
   /**

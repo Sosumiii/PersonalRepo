@@ -2,9 +2,9 @@ import java.util.Random;
 
 public class RandomPermutation 
 {
-
     private static final Random rand = new Random();
-    /* 
+
+    /**
      * The method below gets the specified length of a list and creates a randomized list of numbers ranging
      * from one to ten without repeating any numbers.
      * 
@@ -14,17 +14,21 @@ public class RandomPermutation
     {
         int length = p.length;
         String[] r = new String[randLength];
+        String[] temp = new String[length];
 
-        for (int i = 0; i < r.length; i++)
+        // Copy elements from p to temp
+        for (int i = 0; i < length; i++) {
+            temp[i] = p[i];
+        }
+
+        for (int i = 0; i < randLength; i++)
         {
             int numSelect = rand.nextInt(length);
-            r[i] = p[numSelect];
+            r[i] = temp[numSelect];
             
-            p[numSelect] = p[length - 1];
+            // Swap the selected element with the last element in the array
+            temp[numSelect] = temp[length - 1];
             length--;
-
-            //System.out.println(r[i]); //debug
-            
         }
 
         return r;
