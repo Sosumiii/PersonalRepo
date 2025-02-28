@@ -24,15 +24,20 @@ class Drivetrain(commands2.Subsystem):
         self.gyro = phoenix6.hardware.Pigeon2(9)
         self.gyro.set_yaw(0)
 
-        self.flSM.setDrivePID(3.868, 0.0, 0.054807)
-        self.frSM.setDrivePID(0.505, 0.0, 0.001)
-        self.blSM.setDrivePID(0.51, 0.0, 0.002)
-        self.brSM.setDrivePID(0.52, 0.0, 0.00)
+        self.flSM.setDrivePID(0.017352, 0.0, 0.0)
+        self.frSM.setDrivePID(0.015337, 0.0, 0.0)
+        self.blSM.setDrivePID(0.015337, 0.0, 0.0)
+        self.brSM.setDrivePID(0.017195, 0.0, 0.0)
 
         self.flSM.setRotationPID(0.555, 0.0, 0.002)
         self.frSM.setRotationPID(0.505, 0.0, 0.001)
         self.blSM.setRotationPID(0.51, 0.0, 0.002)
         self.brSM.setRotationPID(0.52, 0.0, 0.00)
+
+        self.flSM.setDriveFF(0.069667, 0.017075, 0.0006183)
+        self.frSM.setDriveFF(0.055517, 0.016857, 0.00044453)
+        self.blSM.setDriveFF(0.06791, 0.017169, 0.00066838)
+        self.brSM.setDriveFF(0.048067, 0.016905, 0.0005649)
         
 
         self.chassisSpeeds = ChassisSpeeds(0, 0, 0)

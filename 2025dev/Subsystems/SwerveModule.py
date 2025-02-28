@@ -84,6 +84,9 @@ class swerveModule(commands2.Subsystem):
             kD,   # Derivative gain
             
         )
+
+    def setDriveFF(self, kS: float, kV: float, kA: float):
+        self.driveMotorFeedForward = wpimath.controller.SimpleMotorFeedforwardMeters(kS, kV, kA)
     
     def setRotationPID(self, kP: float, kI: float, kD: float):
         self.rotationPIDController = wpimath.controller.PIDController(

@@ -115,15 +115,15 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def teleopPeriodic(self) -> None:        
         
-        self.xSpeed = self.applyDeadband(self.controller.getLeftY()) * 2
-        self.ySpeed = self.applyDeadband(self.controller.getLeftX()) * 2
+        self.xSpeed = self.applyDeadband(self.controller.getLeftY()) * 4
+        self.ySpeed = self.applyDeadband(self.controller.getLeftX()) * 4
         
 
         if (self.limelight.aim() > 0 and self.controller.getLeftTriggerAxis() >= 1):
             self.rot = self.limelight.aim()
 
         else:
-            self.rot = self.applyDeadband(self.controller.getRightX()) * 2
+            self.rot = self.applyDeadband(self.controller.getRightX()) * 4
         
         if (self.controller.getRightBumper()):
             self.drivetrain.reset()
