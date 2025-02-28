@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 /**
  * Project 3.6.5
  *
@@ -18,12 +20,27 @@ public class MemoryGame
     // and turn randomization on or off.)
     boolean play = true;
     MemoryGameGUI gui = new MemoryGameGUI();
+    Scanner sc = new Scanner(System.in);
+
+    String user; //= sc.nextLine();
+
+    //user = user.replaceAll("[^a-zA-Z]", "");
+    //user = user.toLowerCase();
+
+    System.out.println("Type one letter then press enter and repeat");
+
+    String[] letters = {new String(user = sc.nextLine().toLowerCase()), new String(user = sc.nextLine().toLowerCase()), new String(user = sc.nextLine().toLowerCase()), new String(user = sc.nextLine().toLowerCase()), new String(user = sc.nextLine().toLowerCase())};
+
+    user = user.replaceAll("[^a-zA-Z]", "");
+    //user = user.toLowerCase();
+
     gui.createBoard(3, true);
 
-    String[] letters = {"a", "b", "c", "d", "e"};
+
+    
     int rounds = 1;
     int score = 0;
-    double time = 1.0;
+    double time = 2.0;
 
     String[] r = RandomPermutation.next(letters, letters.length);
 
@@ -46,6 +63,7 @@ public class MemoryGame
         play = false;
         break;
       }
+
 
       guess = guess.replaceAll("[^a-zA-Z]", "");
       guess = guess.toLowerCase();

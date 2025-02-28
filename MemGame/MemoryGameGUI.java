@@ -10,6 +10,8 @@
  **********************************************************************/
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
+
 import javax.swing.*;
 
 /**
@@ -94,8 +96,11 @@ public class MemoryGameGUI extends JFrame
 
     // show each memory strings on a botton
     int buttonNum = -1; 
+    
     for (int i = 0; i < sequence.length; i++ )
     {
+      Random r = new Random();
+      Color randomColor = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat());
       if (playRandom)
       {
         buttonNum = (int)(Math.random() * gameButtons.length);
@@ -115,7 +120,7 @@ public class MemoryGameGUI extends JFrame
       } catch (InterruptedException ie) { /* do nothing */ }
 
       // change button color and show the memory string
-      gameButtons[buttonNum].setBackground(new Color(230, 204, 255));
+      gameButtons[buttonNum].setBackground(randomColor);
       gameButtons[buttonNum].setText(sequence[i]);
 
       // wait a bit
