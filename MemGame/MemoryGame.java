@@ -47,7 +47,6 @@ public class MemoryGame
         break;
       }
 
-
       guess = guess.replaceAll("[^a-zA-Z]", "");
       guess = guess.toLowerCase();
 

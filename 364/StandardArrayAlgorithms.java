@@ -38,7 +38,7 @@ public class StandardArrayAlgorithms
     /* 
      * The algorithm below requires there to be a list of 10 values. Any list comtaining greater than 10 variables will not be counted by the algorithm.
      */
-    int[] goalCounter = new int[10];
+    /* int[] goalCounter = new int[10];
     
     for (int g : goals)
     {
@@ -51,6 +51,39 @@ public class StandardArrayAlgorithms
     for (int i = 0; i <= 9; i++)
     {
       System.out.println(goalCounter[i]);
+    } */
+
+    Player[] players = {new Player("Alex", 21), new Player("Aiden", 21),
+                    new Player("Bobbie", 21), new Player("Blaine", 21),
+                    new Player("Chris", 21), new Player("Charlie", 21) };
+
+    int i = 0;
+    boolean hasValue = false;
+    boolean allHaveValue = true;
+
+    /* while (hasValue == false)
+    {
+      if (hasValue == false || i < players.length)
+      {
+        hasValue = true;
+        System.out.println("Property Found.");
+      }
+      i++;
+    } */
+
+    while (allHaveValue == true && i < players.length)
+    {
+      if (!(players[i].getAge() == 21))
+      {
+        allHaveValue = false;
+        System.out.println("Not all of the players are 21 years old.");
+      }
+      i++;
+    }
+
+    if (allHaveValue == true)
+    {
+      System.out.println("All of the players are 21 years old.");
     }
     
     

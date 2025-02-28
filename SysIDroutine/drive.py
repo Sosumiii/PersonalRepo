@@ -36,11 +36,13 @@ class DriveControl(commands2.Subsystem):
         motorConfig = configs.TalonFXConfiguration()
 
         #inverted = motorConfig.motor_output.with_inverted(1)
+        
+        brake = motorConfig.motor_output.with_neutral_mode(phoenix6.signals.NeutralModeValue.BRAKE)
         currents = motorConfig.current_limits.with_stator_current_limit_enable(True)
         currents.with_stator_current_limit(40)
 
-        #motorConfig.with_motor_output(inverted)
         motorConfig.with_current_limits(currents)
+        motorConfig.with_motor_output(brake)
         motorConfig.serialize()
 
         for motor in self.motors:

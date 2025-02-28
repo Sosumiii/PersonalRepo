@@ -88,7 +88,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def robotPeriodic(self): 
         self.drivetrain.updateOdometry()        
-        """ wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)
+        wpilib.SmartDashboard.putNumber("FLD Temp", self.drivetrain.flSM.driveMotor.get_device_temp().value_as_double)
         wpilib.SmartDashboard.putNumber("FLR Temp", self.drivetrain.flSM.rotationMotor.getMotorTemperature())
         
         wpilib.SmartDashboard.putNumber("FRD Temp", self.drivetrain.frSM.driveMotor.get_device_temp().value_as_double)
@@ -98,8 +98,7 @@ class MyRobot(commands2.TimedCommandRobot):
         wpilib.SmartDashboard.putNumber("BLR Temp", self.drivetrain.blSM.rotationMotor.getMotorTemperature())
 
         wpilib.SmartDashboard.putNumber("BRD Temp", self.drivetrain.brSM.driveMotor.get_device_temp().value_as_double)
-        wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature()) """
-        #self.encoderCheck()
+        wpilib.SmartDashboard.putNumber("BRR Temp", self.drivetrain.brSM.rotationMotor.getMotorTemperature())
        
 
         return super().robotPeriodic()

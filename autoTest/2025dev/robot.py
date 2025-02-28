@@ -24,16 +24,16 @@ from wpilib import SmartDashboard
 drivetrain = Drivetrain()
 
 AutoBuilder.configure(
-    drivetrain.getPose(),
-    drivetrain.reset(),
-    drivetrain.getChassisSpeedsRO(),
-    lambda speeds: drivetrain.driveRO(speeds),
+    drivetrain.getPose,
+    drivetrain.resetPose,
+    drivetrain.getChassisSpeedsRO,
+    lambda speeds, feedforwards: drivetrain.driveRO(speeds),
     PPHolonomicDriveController(
         PIDConstants(0.001, 0.0, 0.0),
         PIDConstants(0.001, 0.0, 0.0),
     ),
     RobotConfig.fromGUISettings(),
-    drivetrain.shouldFlipPath(),
+    drivetrain.shouldFlipPath,
     drivetrain
     ) 
 
@@ -68,22 +68,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
         #self.configureAuto()
 
-        # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-
-    """ def configureAuto(self):
-        AutoBuilder.configure(
-            self.drivetrain.odometry.getPose,
-            self.drivetrain.reset,
-            self.drivetrain.getChassisSpeedsRO,
-            lambda speeds: self.drivetrain.driveRO,
-            PPHolonomicDriveController(
-                PIDConstants(0.001, 0.0, 0.0),
-                PIDConstants(0.001, 0.0, 0.0),
-            ),
-            self.config,
-            self.drivetrain.shouldFlipPath,
-            self.drivetrain
-            )  """
         
     def getAutoCommand(self):
         self.autoSelected = self.test
@@ -93,7 +77,7 @@ class MyRobot(commands2.TimedCommandRobot):
     
     def autonomousInit(self):
         self.command = self.getAutoCommand()
-        self.command
+        self.command.schedule()
         return super().autonomousInit()
         
     def autonomousPeriodic(self):

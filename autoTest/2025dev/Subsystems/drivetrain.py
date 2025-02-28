@@ -4,6 +4,7 @@ import math
 import wpilib
 from commands2 import Subsystem
 import wpimath.controller
+import wpimath.geometry
 import wpimath.kinematics
 import wpimath.trajectory
 import wpimath.units
@@ -61,8 +62,9 @@ class Drivetrain(Subsystem):
         """
         self.gyro.set_yaw(0)
 
-        self.odometry.resetPosition(
-            self.gyro.getRotation2d(),
+        self.odometry = SwerveDrive4Odometry(
+            self.kinematics,
+            Rotation2d(),
             (
                 self.flSM.getPosition(),
                 self.frSM.getPosition(),
@@ -74,6 +76,9 @@ class Drivetrain(Subsystem):
     
     def getPose(self):
         return self.odometry.getPose()
+    
+    def resetPose(self, pose2d: wpimath.geometry.Pose2d):
+        self.odometry.resetPose(pose2d)
     
     def getChassisSpeedsRO(self):
         return self.chassisSpeeds.fromRobotRelativeSpeeds(self.chassisSpeeds, robotAngle=self.gyro.getRotation2d())
