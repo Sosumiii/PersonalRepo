@@ -4,7 +4,7 @@
  *  @author PLTW
  * @version 2.0
  */
-
+import java.util.*;
 /** 
  * A Board class for concentration
  */
@@ -35,6 +35,20 @@ public class Board
         gameboard[i][j] = new Tile(tileValues[count]);
         count++;
       }
+
+    // shuffle the tiles
+    ArrayList<Tile> tileList = new ArrayList<>();
+    for (int i = 0; i < gameboard.length; i++) {
+      for (int j = 0; j < gameboard[0].length; j++) {
+        tileList.add(gameboard[i][j]);
+      }
+    }
+    ArrayList<Tile> shuffledTiles = RandomPermutation.next(tileList);
+    for (int i = 0; i < gameboard.length; i++) {
+      for (int j = 0; j < gameboard[0].length; j++) {
+        gameboard[i][j] = shuffledTiles.get(i * gameboard[0].length + j);
+      }
+    }
 
   }
 
