@@ -1,8 +1,8 @@
-from Books import booksModifier
+from Books import Books
 
 def main():
     #Create the list of books
-    booksMod = booksModifier()
+    booksMod = Books()
     keepGoing = "y"
 
     while True:
@@ -26,7 +26,7 @@ def main():
                 booksMod.getAllInfo()
 
             case 3:
-                booksMod.addBook()
+                booksMod.addSingularBook()
 
             case 4:
                 title = str(input("Please enter the title of the book that you are searching for: "))

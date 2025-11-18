@@ -1,15 +1,28 @@
 import os
 fileName = "books.txt"
 
-class booksModifier():
+class Books():
     def __init__(self):
         super().__init__()
 
-    def addBook(self):
-        keepGoing = "y"
+    def addSingularBook(self):
+        self.bookFile = open(fileName, "a")
+        title = input("Enter the title of the book: ")
+        price = float(input("Enter the price of the book: $"))
+        quantity = int(input("Enter the amount of books: "))
 
-        while (keepGoing == "y"):
-            self.bookFile = open(fileName, "w")
+        self.bookFile.write(title + "\n")
+        self.bookFile.write(f"{price:.2f}\n")
+        self.bookFile.write(str(quantity) + "\n")
+
+        self.closeFile()
+
+    def addBook(self):
+        self.bookFile = open(fileName, "w")
+
+        while True:
+            print("\n")
+            
             title = input("Enter the title of the book: ")
             price = float(input("Enter the price of the book: $"))
             quantity = int(input("Enter the amount of books: "))
@@ -19,10 +32,14 @@ class booksModifier():
             self.bookFile.write(str(quantity) + "\n")
 
             keepGoing = input("Would you like to keep adding books? (y/n): ").lower()
+
+            if (keepGoing != "y"):
+                break
     
         self.closeFile()
 
     def getAllInfo(self):
+        print("\n")
         self.bookFile = open(fileName, "r")
         bookTitle = self.bookFile.readline()
 
@@ -41,6 +58,8 @@ class booksModifier():
         self.bookFile.close()
 
     def getBook(self, title: str):
+        print("\n")
+
         found = False
         self.bookFile = open(fileName, "r")
         bookTitle = self.bookFile.readline()
@@ -65,6 +84,8 @@ class booksModifier():
 
 
     def setQuantity(self, title: str, quantityChange: int):
+        print("\n")
+
         self.bookFile = open(fileName, "r")
         tempFile = open("tempBooks.txt", "a")
         
@@ -100,6 +121,8 @@ class booksModifier():
             print(f"The quantity for {title} has been updated to {quantityChange}.")
 
     def removeBook(self, title: str):
+        print("\n")
+
         self.bookFile = open(fileName, "r")
         tempFile = open("tempBooks.txt", "a")
         

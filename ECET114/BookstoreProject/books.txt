@@ -1,3 +1,15 @@
-mathematics
+Programming
+49.99
+223
+English
 59.99
-120
+40
+Calculus
+39.99
+20
+Robotics
+29.99
+10
+Linux OS
+56.99
+14
