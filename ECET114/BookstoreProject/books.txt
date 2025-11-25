@@ -1,15 +1,15 @@
 Programming
 49.99
-223
-English
-59.99
-40
+210
 Calculus
-39.99
-20
-Robotics
-29.99
-10
-Linux OS
-56.99
-14
+78.99
+34
+English
+34.80
+19
+Engineering
+104.99
+67
+Writing
+67.99
+45

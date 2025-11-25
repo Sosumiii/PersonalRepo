@@ -87,7 +87,8 @@ class Books():
         print("\n")
 
         self.bookFile = open(fileName, "r")
-        tempFile = open("tempBooks.txt", "a")
+        tempFile = open("tempBooks.txt", "w")
+        found = False
         
         bookTitle = self.bookFile.readline()
         while (bookTitle != ""):
@@ -108,17 +109,18 @@ class Books():
 
             bookTitle = self.bookFile.readline()
 
+        if not found:
+            print("Book was not found.")
+
+        else:
+            print(f"The quantity for {title} has been updated to {quantityChange}.")
+
         tempFile.close()
         self.closeFile()
 
         os.remove("books.txt")
         os.rename("tempBooks.txt", "books.txt")
         
-        if not found:
-            print("Book was not found.")
-
-        else:
-            print(f"The quantity for {title} has been updated to {quantityChange}.")
 
     def removeBook(self, title: str):
         print("\n")

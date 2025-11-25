@@ -2,7 +2,7 @@ from Books import Books
 
 def main():
     #Create the list of books
-    booksMod = Books()
+    library = Books()
     keepGoing = "y"
 
     while True:
@@ -17,40 +17,43 @@ def main():
         print("6. Remove a book")
         print("7. Quit the program")
 
-        answer = int(input("Please a number selection from the list above (ex: type '1' if you want to create a list of books): "))
-        match answer:
-            case 1:
-                booksMod.addBook()
+        try:
+            answer = int(input("Please a number selection from the list above (ex: type '1' if you want to create a list of books): "))
+            match answer:
+                case 1:
+                    library.addBook()
 
-            case 2:
-                booksMod.getAllInfo()
+                case 2:
+                    library.getAllInfo()
 
-            case 3:
-                booksMod.addSingularBook()
+                case 3:
+                    library.addSingularBook()
 
-            case 4:
-                title = str(input("Please enter the title of the book that you are searching for: "))
-                booksMod.getBook(title)
+                case 4:
+                    title = str(input("Please enter the title of the book that you are searching for: "))
+                    library.getBook(title)
 
-            case 5:
-                title = str(input("Please enter the title of the book that you are searching for: "))
-                quantity = int(input("Please enter the new quantity of the book: "))
-                booksMod.setQuantity(title, quantity)
+                case 5:
+                    title = str(input("Please enter the title of the book that you are searching for: "))
+                    quantity = int(input("Please enter the new quantity of the book: "))
+                    library.setQuantity(title, quantity)
 
-            case 6:
-                title = str(input("Please enter the title of the book that you want to remove: "))
-                booksMod.removeBook(title)
+                case 6:
+                    title = str(input("Please enter the title of the book that you want to remove: "))
+                    library.removeBook(title)
 
-            case 7:
-                print("Exiting program")
-                break
+                case 7:
+                    print("Exiting program")
+                    break
 
-            case _:
-                print("-----------------------")
-                print("Invalid Choice")
-                print("-----------------------")
-
-
+                case _:
+                    print("-----------------------")
+                    print("Invalid Choice")
+                    print("-----------------------")
+        except:
+            print("-----------------------")
+            print("Invalid Choice")
+            print("-----------------------")          
 
 if __name__ == "__main__":
     main()
