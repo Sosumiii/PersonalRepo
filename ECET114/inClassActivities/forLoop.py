@@ -18,20 +18,17 @@ avg = total/MAX
 
 print(f"{total:.2f}")
 print(f"{avg:.2f}") """
-
-keepGoing = True
 total = 0
 counter = 0
+score = 0
 
-while (keepGoing):
+while (score != -1):
     score = float(input("Enter the score: "))
     total += score
 
     counter += 1
-    choice = input("Enter y to continue: ").lower()
-    if (choice != "y"):
-        keepGoing = False
 
 avg  = total / counter
+
 print(f"the total is {total}")
 print(f"the average is {avg:.2f}")
