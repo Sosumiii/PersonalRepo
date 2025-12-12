@@ -1,0 +1,8 @@
+#line 1 "/home/sosumi/Documents/Github/PersonalRepo/ArduinoStuff/ultrasonics/.vscode/arduino.json"
+{
+    "sketch": "ultrasonics.ino",
+    "output": "build",
+    "board": "arduino:avr:uno",
+    "port": "/dev/ttyACM0",
+    "programmer": "avrispmkii"
+}
