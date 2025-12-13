@@ -1,0 +1,7 @@
+{
+    "sketch": "thermometer.ino",
+    "output": "build",
+    "board": "arduino:avr:uno",
+    "programmer": "avrisp",
+    "port": "/dev/ttyACM0"
+}
