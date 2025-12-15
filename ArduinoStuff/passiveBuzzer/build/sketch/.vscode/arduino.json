@@ -1,0 +1,7 @@
+#line 1 "/home/sosumi/Documents/Github/PersonalRepo/ArduinoStuff/passiveBuzzer/.vscode/arduino.json"
+{
+    "sketch": "passiveBuzzer.ino",
+    "output": "build",
+    "board": "arduino:avr:uno",
+    "port": "/dev/ttyACM0"
+}

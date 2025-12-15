@@ -1,0 +1,9 @@
+{
+  "additionalFiles": "../../..,../../..",
+  "compiler.optimization_flags": "",
+  "customBuildProperties": "",
+  "fqbn": "arduino:avr:uno",
+  "hardwareFolders": "/home/sosumi/.arduino15/packages",
+  "otherLibrariesFolders": "/home/sosumi/Arduino/libraries",
+  "sketchLocation": "/home/sosumi/Documents/Github/PersonalRepo/ArduinoStuff/passiveBuzzer"
+}
