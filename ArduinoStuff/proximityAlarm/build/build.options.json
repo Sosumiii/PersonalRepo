@@ -3,7 +3,7 @@
   "compiler.optimization_flags": "",
   "customBuildProperties": "",
   "fqbn": "arduino:avr:uno",
-  "hardwareFolders": "/home/sosumi/.arduino15/packages",
+  "hardwareFolders": "/home/sosumi/.arduino15/packages/arduino/hardware/avr/1.8.6,/home/sosumi/.arduino15/packages/arduino/hardware/avr/1.8.6",
   "otherLibrariesFolders": "/home/sosumi/Arduino/libraries",
   "sketchLocation": "/home/sosumi/Documents/Github/PersonalRepo/ArduinoStuff/proximityAlarm"
 }
