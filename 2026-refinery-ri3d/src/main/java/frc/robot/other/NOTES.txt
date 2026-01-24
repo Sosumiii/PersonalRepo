@@ -1,0 +1,33 @@
+CAN IDs
+
+MK5N modules, R3 ratio
+Pigeon2 gyroscope
+CTRE swerve template
+
+FLdrive = 2
+FLturn = 3
+FRdrive = 4
+FRturn = 5
+RLdrive = 6
+RLturn = 7
+RRdrive = 8
+RRturn = 9
+FLenc = 10
+FRenc = 11
+RLenc = 12
+RRenc = 13
+gyro = 14
+
+shooter1 = 18
+shooterfeed1 = 20
+
+intake rollers = 22
+intake extend = 23
+
+climber left = 24
+climber right = 25
+
+dump sequence
+    intake reverses direction
+    feed motor forward at normal speed
+    shooter at slow speed setpoint after spin up time
