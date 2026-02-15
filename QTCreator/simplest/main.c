@@ -2,6 +2,10 @@
 
 int main()
 {
-    printf("Hello World!\n");
+
+    int x = 1;
+    int y = 2;
+    int z = x + y;
+    printf(z);
     return 0;
 }
