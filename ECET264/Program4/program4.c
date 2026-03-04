@@ -8,7 +8,7 @@
 //
 //  Course     : ECET 264
 //
-//  Date Due   : February 27, 2026
+//  Date Due   : March 4, 2026
 //
 //  Platform   : ASUS Vivobook S16 (Linux x64 6.18.12-1-MANJARO)
 //
@@ -59,20 +59,20 @@
 //////////////////////////////////////////////////////////////////////////////// 
 int main(void) {
   //Local variables
-  float theta = 0.00; //angle in radians
-  float distance = 0.00; // in feet
-  float velocity = 0.00; //in feet per second
+  double theta = 0.00; //angle in radians
+  double distance = 0.00; // in feet
+  double velocity = 0.00; //in feet per second
 
   //breaking down calculations into two sections due to character limit
-  float heightCalc1 = 0.00;
-  float heightCalc2 = 0.00;
+  double heightCalc1 = 0.00;
+  double heightCalc2 = 0.00;
 
-  float time = 0.00; //in seconds
-  float height = 0.00; //in feet
+  double time = 0.00; //in seconds
+  double height = 0.00; //in feet
 
   //Begin
   printf("Enter the angle of the projectile in radians (between 0 and PI/2): ");
-  scanf("%f", &theta);
+  scanf("%lf", &theta);
 
   if ((theta > THETA_MAX) || (theta <= THETA_MIN)) {
     printf("the angle, %.4f, is invalid (has to be a value between 0 and pi/2).", theta);
@@ -81,19 +81,19 @@ int main(void) {
   
   else {
     printf("Enter the distance in feet: ");
-    scanf("%f", &distance);
+    scanf("%lf", &distance);
 
     if (distance <= 0) {
-      printf("the distance, %.4f, is invalid (has to be a number greater than 0).", distance);
+      printf("the distance, %.4lf, is invalid (has to be a number greater than 0).", distance);
       return 0;
     }
 
     else {
       printf("Enter the velocity of the projectile in feet per second: ");
-      scanf("%f", &velocity);
+      scanf("%lf", &velocity);
 
       if (velocity <= 0) {
-        printf("the velocity, %f, is invalid (has to be a number greater than 0).", velocity);
+        printf("the velocity, %lf, is invalid (has to be a number greater than 0).", velocity);
         return 0;
       }
 
@@ -110,10 +110,9 @@ int main(void) {
         /*display both the total flight time and height of the projectile if
           the final height is greater than ground level */
         
-        if (height > GROUND_LEVEL)
-        {
-          printf("Total flight time: %.3f seconds.\n", time);
-          printf("Total height when it reaches the target: %.3f feet.\n", height);
+        if (height >= GROUND_LEVEL) {
+          printf("Total flight time: %.3lf seconds.\n", time);
+          printf("Total height when it reaches the target: %.3lf feet.\n", height);
         }
         else {
           printf("The projectile has struck the ground instead of the target.");
