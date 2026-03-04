@@ -8,7 +8,7 @@
 //
 //  Course     : ECET 264
 //
-//  Date Due   : March 4, 2026
+//  Date Due   : March 6, 2026
 //
 //  Platform   : ASUS Vivobook S16 (Linux x64 6.18.12-1-MANJARO)
 //
@@ -44,7 +44,7 @@
 // 
 //  Function Name : main
 // 
-//  Originated    : February 12, 2026
+//  Originated    : February 18, 2026
 // 
 //  Abstract      : This function is where the main program is executed.
 // 
@@ -75,7 +75,7 @@ int main(void) {
   scanf("%lf", &theta);
 
   if ((theta > THETA_MAX) || (theta <= THETA_MIN)) {
-    printf("the angle, %.4f, is invalid (has to be a value between 0 and pi/2).", theta);
+    printf("the angle, %.3f, is invalid (has to be a value between 0 and pi/2).", theta);
     return 0;
   }
   
@@ -84,7 +84,7 @@ int main(void) {
     scanf("%lf", &distance);
 
     if (distance <= 0) {
-      printf("the distance, %.4lf, is invalid (has to be a number greater than 0).", distance);
+      printf("the distance, %.3lf, is invalid (has to be a number greater than 0).", distance);
       return 0;
     }
 
@@ -93,7 +93,7 @@ int main(void) {
       scanf("%lf", &velocity);
 
       if (velocity <= 0) {
-        printf("the velocity, %lf, is invalid (has to be a number greater than 0).", velocity);
+        printf("the velocity, %3lf, is invalid (has to be a number greater than 0).", velocity);
         return 0;
       }
 
