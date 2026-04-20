@@ -28,11 +28,11 @@ int main(void){
     {
         printf("%s is less than %s\n", string1, string2);
     }
-    else if (cmpResults > 0)
+  else if (cmpResults > 0)
     {
         printf("%s is greater than %s\n", string1, string2);
     }
-    else
+  else
     {
         printf("%s is equal to %s\n", string1, string2);
     }
